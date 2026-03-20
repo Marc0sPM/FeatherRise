@@ -1,0 +1,58 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!78 &1
+TagManager:
+  serializedVersion: 2
+  tags: []
+  layers:
+  - Default
+  - TransparentFX
+  - Ignore Raycast
+  - Floor
+  - Water
+  - UI
+  - FeatherRange
+  - Player
+  - wall
+  - Enemies
+  - void
+  - Trunk
+  - Feather
+  - PatrolStop
+  - RangeEnemy
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  m_SortingLayers:
+  - name: Default
+    uniqueID: 0
+    locked: 0
+  - name: walls
+    uniqueID: 802826573
+    locked: 0
+  - name: player
+    uniqueID: 4046757391
+    locked: 0
+  - name: particles
+    uniqueID: 1079010479
+    locked: 0
+  - name: text
+    uniqueID: 1495823479
+    locked: 0
+  - name: tuto
+    uniqueID: 632571185
+    locked: 0
