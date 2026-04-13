@@ -1,7 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Runtime.Serialization;
 using UnityEngine;
 
 public class Tracker : MonoBehaviour
