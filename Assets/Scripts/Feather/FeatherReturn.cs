@@ -35,7 +35,7 @@ public class FeatherReturn : MonoBehaviour
     private void Return(Vector3 endPos)
     {
         Vector3 direction = endPos - transform.position;
-        _rb2D.velocity = new Vector3(direction.x, direction.y).normalized * _returnSpeed;
+        _rb2D.linearVelocity = new Vector3(direction.x, direction.y).normalized * _returnSpeed;
         
     }
 }

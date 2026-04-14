@@ -11,12 +11,14 @@ using UnityEngine;
 [System.Serializable]
 public class Checkpoint_Reached : TrackerEvent
 {
-    public string checkpoint_id;
-    public string level_id;
+    public float pos_x;
+    public float pos_y;
+    public int level_id;
 
-    public Checkpoint_Reached(string checkpoint_id, string level_id) : base()
+    public Checkpoint_Reached(float pos_x, float pos_y, int level_id) : base()
     {
-        this.checkpoint_id = checkpoint_id;
+        this.pos_x = pos_x;
+        this.pos_y = pos_y;
         this.level_id = level_id;
     }
 }
@@ -31,9 +33,9 @@ public class Player_Death : TrackerEvent
     public float pos_x;
     public float pos_y;
     public string cause_of_death;
-    public string level_id;
+    public int level_id;
 
-    public Player_Death(float x, float y, string cause, string level) : base()
+    public Player_Death(float x, float y, string cause, int level) : base()
     {
         this.pos_x = x;
         this.pos_y = y;
@@ -65,9 +67,9 @@ public class Feather_Recall_Attempt : TrackerEvent
 public class Chest_Opened : TrackerEvent
 {
     public string chest_id;
-    public string level_id;
+    public int level_id;
 
-    public Chest_Opened(string chest_id, string level_id) : base()
+    public Chest_Opened(string chest_id, int level_id) : base()
     {
         this.chest_id = chest_id;
         this.level_id = level_id;

@@ -30,7 +30,7 @@ public class WoodComponent : MonoBehaviour
     {
         GetComponent<BoxCollider2D>().enabled = false;
         _myRigidbody2D.gravityScale = 0;
-        _myRigidbody2D.velocity = Vector2.zero;
+        _myRigidbody2D.linearVelocity = Vector2.zero;
 
         yield return new WaitForSeconds(_waitingSeconds);
 
@@ -61,7 +61,7 @@ public class WoodComponent : MonoBehaviour
             if (transform.position.y >= _startPosition.y)
             {
                 _myRigidbody2D.gravityScale = 0;
-                _myRigidbody2D.velocity = Vector2.zero;
+                _myRigidbody2D.linearVelocity = Vector2.zero;
                 _canFall = true;
                 _returning = false;
                 GetComponent<BoxCollider2D>().enabled = true;

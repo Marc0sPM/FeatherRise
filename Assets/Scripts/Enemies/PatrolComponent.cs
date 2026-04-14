@@ -40,7 +40,7 @@ public class PatrolComponent : MonoBehaviour
         Move();
         if(_stop)
         {
-            _enemyRB.velocity = new Vector2(0, 0);
+            _enemyRB.linearVelocity = new Vector2(0, 0);
             if(_time > _timeCoolDown)
             {
                 Turn();
@@ -49,7 +49,7 @@ public class PatrolComponent : MonoBehaviour
             }
             _time += Time.deltaTime;
         }
-        _animator.SetFloat("Horizontal", Mathf.Abs(_enemyRB.velocity.x));
+        _animator.SetFloat("Horizontal", Mathf.Abs(_enemyRB.linearVelocity.x));
     }
     private void FixedUpdate()
     {
@@ -57,7 +57,7 @@ public class PatrolComponent : MonoBehaviour
     }
     private void Move()
     {
-        _enemyRB.velocity = new Vector2(_moveSpeed * _direction * -1, _enemyRB.velocity.y);
+        _enemyRB.linearVelocity = new Vector2(_moveSpeed * _direction * -1, _enemyRB.linearVelocity.y);
         
     }
 

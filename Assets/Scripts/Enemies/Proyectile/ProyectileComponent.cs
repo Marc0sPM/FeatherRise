@@ -37,7 +37,7 @@ public class ProyectileComponent : MonoBehaviour
             _canDamage = !_canDamage;
             _explossionSys.Play();
             GetComponent<SpriteRenderer>().enabled = false;
-            GetComponent<Rigidbody2D>().velocity = Vector2.zero;
+            GetComponent<Rigidbody2D>().linearVelocity = Vector2.zero;
             if(_explossionSys.isStopped)
             {
                 Destroy(gameObject);

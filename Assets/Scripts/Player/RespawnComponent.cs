@@ -46,7 +46,7 @@ public class RespawnComponent : MonoBehaviour
         GetComponent<InputComponent>().enabled = false;
         DisablePhysics();
         _rb.gravityScale = 6f;
-        _rb.velocity = Vector2.zero;
+        _rb.linearVelocity = Vector2.zero;
        
     }
     private void DisablePhysics()

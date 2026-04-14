@@ -1,9 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.CompilerServices;
 
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
+using UnityEngine.SceneManagement;
+using static UnityEditor.Experimental.GraphView.GraphView;
 
 public class PlayerCombat : MonoBehaviour
 {
@@ -60,34 +63,38 @@ public class PlayerCombat : MonoBehaviour
 
             Collider2D[] _hitEnemies = Physics2D.OverlapCapsuleAll(_attackPoint.position, _attackSize, _direction, _angleAttack, _enemylayer | _rangeLayer);
 
+            // Tracking de evento de ataque
+            Tracker.Instance.TrackEvent(new Player_Attack(AttackType.Ground, _hitEnemies.Count() > 0));            
+            
             foreach (Collider2D enemies in _hitEnemies)
-            {
-                if ((bool)enemies.GetComponent<BossManager>())
                 {
-                    enemies.GetComponent<BossManager>().ReceiveDamage(1);
-                }
-                else
-                {
-                    enemies.GetComponent<LifeEnemyComponent>().TakeDamage(_attackDamage);
-                    enemies.GetComponent<RecoilComponent>().KnockBack(this.gameObject);
-                }
+                    if ((bool)enemies.GetComponent<BossManager>())
+                    {
+                        enemies.GetComponent<BossManager>().ReceiveDamage(1);
+                    }
+                    else
+                    {
+                        enemies.GetComponent<LifeEnemyComponent>().TakeDamage(_attackDamage);
+                        enemies.GetComponent<RecoilComponent>().KnockBack(this.gameObject);
+                    }
 
-            }
+                }
         }
         else
         {
             GetComponent<InputComponent>().enabled = false;
             GetComponent<Rigidbody2D>().gravityScale = 0;
-            GetComponent<Rigidbody2D>().velocity = Vector2.zero;
+            GetComponent<Rigidbody2D>().linearVelocity = Vector2.zero;
           
             _animator.SetTrigger("Air");
             SoundComponent.Instance.PlaySound(SoundComponent.Instance._playerAirAttack);
             Collider2D[] _hitEnemisOnAir = Physics2D.OverlapCircleAll(_attackPoint.position, _radius, _enemylayer | _rangeLayer);
 
 
+            // Tracking de evento de ataque
+            Tracker.Instance.TrackEvent(new Player_Attack(AttackType.Aerial, _hitEnemisOnAir.Count() > 0));
 
-            
-            foreach(Collider2D enemiesOnAir in _hitEnemisOnAir)
+            foreach (Collider2D enemiesOnAir in _hitEnemisOnAir)
             {
                 if ((bool)enemiesOnAir.GetComponent<BossManager>())
                 {
@@ -112,7 +119,7 @@ public class PlayerCombat : MonoBehaviour
         }
 
     }
-    //Llamado por un event al final de la animación
+    //Llamado por un event al final de la animaciï¿½n
     public void ActivaInput()
     {
         GetComponent<InputComponent>().enabled = true;

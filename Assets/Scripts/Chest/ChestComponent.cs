@@ -4,6 +4,8 @@ using System.Threading;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
+using UnityEngine.SceneManagement;
+using static UnityEditor.Experimental.GraphView.GraphView;
 
 
 public class ChestComponent : MonoBehaviour
@@ -46,6 +48,11 @@ public class ChestComponent : MonoBehaviour
                 _myAnimator.SetBool("Opened", _opened);
                 SoundComponent.Instance.PlaySound(SoundComponent.Instance._chestOpening);
                 this.enabled = false;
+
+                string item_name = _content.name.ToLower();
+
+                int levelId = SceneManager.GetActiveScene().buildIndex;
+                Tracker.Instance.TrackEvent(new Chest_Opened(item_name,  levelId));
             }
         }
     }

@@ -65,6 +65,6 @@ public class RecoilComponent : MonoBehaviour
     {
         yield return new WaitForSeconds(_delay);
         EnabledDisabled(true); //Enabled all needed components
-        _rb2D.velocity = Vector3.zero;
+        _rb2D.linearVelocity = Vector3.zero;
     }
 }

@@ -1,4 +1,5 @@
  using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
@@ -86,6 +87,8 @@ public class GameManager : MonoBehaviour
     public void Checkpoint(Vector2 respawnP)
     {
         _respawnPoint = respawnP;
+        int levelId = SceneManager.GetActiveScene().buildIndex;
+        Tracker.Instance.TrackEvent(new Checkpoint_Reached(_respawnPoint.x, _respawnPoint.y, levelId));
     }
     public void AddFeather()
     {
@@ -181,6 +184,20 @@ public class GameManager : MonoBehaviour
             ReceiveDamage(enemy);
 
             Debug.Log("PIERDE ALMA");
+            if(_souls <= 0)
+            {
+                if ((bool)enemy.GetComponent<SpinComponent>())
+                {
+                    int levelId = SceneManager.GetActiveScene().buildIndex;
+                    Tracker.Instance.TrackEvent(new Player_Death(_player.transform.position.x, _player.transform.position.x, "enemy_mele", levelId));
+                }
+                else if ((bool)enemy.GetComponent<ProyectileComponent>())
+                {
+                    int levelId = SceneManager.GetActiveScene().buildIndex;
+                    Tracker.Instance.TrackEvent(new Player_Death(_player.transform.position.x, _player.transform.position.x, "enemy_range", levelId));
+                }
+            }
+            
         }
     }
     private void ReceiveDamage(GameObject enemy)
@@ -215,8 +232,11 @@ public class GameManager : MonoBehaviour
         _nextState = GameStates.TUTORIAL;
         _respawnPoint = _player.transform.position;
         EvalueG();
-        
 
+        // Trackeo de Checkpoint_Reached
+
+        int levelId = SceneManager.GetActiveScene().buildIndex;
+        Tracker.Instance.TrackEvent(new Checkpoint_Reached(_respawnPoint.x, _respawnPoint.y, levelId));
     }
 
     // Update is called once per frame

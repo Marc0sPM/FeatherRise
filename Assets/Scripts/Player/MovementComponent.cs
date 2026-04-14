@@ -63,8 +63,8 @@ public class MovementComponent : MonoBehaviour
     private void Update()
     {
         _playerAnim.SetBool("onFloor", _touchingFloor);
-        _playerAnim.SetFloat("Horizontal", Mathf.Abs(_playerRB.velocity.x));
-        _playerAnim.SetFloat("Vertical", _playerRB.velocity.y);
+        _playerAnim.SetFloat("Horizontal", Mathf.Abs(_playerRB.linearVelocity.x));
+        _playerAnim.SetFloat("Vertical", _playerRB.linearVelocity.y);
         _playerAnim.SetBool("Dash", _canDash);
     }
     //evaluacion de las fisicas para saber si toca suelo o una pared
@@ -88,7 +88,7 @@ public class MovementComponent : MonoBehaviour
     {
         if(!_touchingWalls)
         {
-            _playerRB.velocity = new Vector2(_playerDirection * _moveSpeed, _playerRB.velocity.y);
+            _playerRB.linearVelocity = new Vector2(_playerDirection * _moveSpeed, _playerRB.linearVelocity.y);
         }
         //evaluaciones auxiliares para llamar al metodo turn
         if (_playerDirection > 0 && !_lookingRight)
@@ -113,11 +113,11 @@ public class MovementComponent : MonoBehaviour
             _canDash = false;
             _trail.emitting = true;
             _playerRB.gravityScale = 0;
-            _playerRB.velocity = new Vector2(_dashVelocity * transform.localScale.x, 0);
+            _playerRB.linearVelocity = new Vector2(_dashVelocity * transform.localScale.x, 0);
 
             yield return new WaitForSeconds(_timeDash); //dash execution time
 
-            _playerRB.velocity = new Vector2(0, _playerRB.velocity.y); //stop dash 
+            _playerRB.linearVelocity = new Vector2(0, _playerRB.linearVelocity.y); //stop dash 
                                                                        //_canMove = true;
             _canDash = true;
             _trail.emitting = false;

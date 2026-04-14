@@ -27,7 +27,7 @@ public class LifeEnemyComponent : MonoBehaviour
         if (_currentHealth <= 0)
         {
             _isDeath = true;
-            this.gameObject.GetComponent<Rigidbody2D>().velocity = Vector2.zero;
+            this.gameObject.GetComponent<Rigidbody2D>().linearVelocity = Vector2.zero;
             this.gameObject.GetComponent<Rigidbody2D>().gravityScale = 0;
             
             if ((bool)this.gameObject.GetComponent<SpinComponent>()) //evaula si es mele
@@ -43,7 +43,7 @@ public class LifeEnemyComponent : MonoBehaviour
     {
         
         _currentHealth -= damage;
-        _showDamage.StartCoroutine(_showDamage.ModSprite()); //Animacion daño
+        _showDamage.StartCoroutine(_showDamage.ModSprite()); //Animacion daï¿½o
        
        
             Debug.Log(_currentHealth + "NAshe");

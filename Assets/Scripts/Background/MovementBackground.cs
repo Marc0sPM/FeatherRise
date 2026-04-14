@@ -23,7 +23,7 @@ public class MovementBackground : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        _offset = (_rbplayer.velocity.x * 0.1f) * _velocity * Time.deltaTime; //Mirar la frenada más adelante
+        _offset = (_rbplayer.linearVelocity.x * 0.1f) * _velocity * Time.deltaTime; //Mirar la frenada mï¿½s adelante
         _material.mainTextureOffset += _offset;
     }
 }

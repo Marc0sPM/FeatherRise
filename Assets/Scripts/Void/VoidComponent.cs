@@ -1,5 +1,6 @@
 
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class VoidComponent : MonoBehaviour
 {
@@ -13,12 +14,16 @@ public class VoidComponent : MonoBehaviour
         if ((bool)collision.gameObject.GetComponent<InputComponent>())
         {
             Debug.Log("ColRes");
-            collision.gameObject.GetComponent<RespawnComponent>().Respawn();
+            var player = collision.gameObject;
+            player.GetComponent<RespawnComponent>().Respawn();
             if (GameManager._lifes >= 0)
             {
                 GameManager._lifes = -1;
                 GameManager.Instance.EvalueG();
             }
+
+            int levelId = SceneManager.GetActiveScene().buildIndex;
+            Tracker.Instance.TrackEvent(new Player_Death(player.transform.position.x, player.transform.position.y, "void", levelId));
         }
         if ((bool)collision.gameObject.GetComponent<LifeEnemyComponent>())
         {

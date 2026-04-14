@@ -31,7 +31,7 @@ public class ThownEnemyComponent : MonoBehaviour
     {
         if (collision.collider.gameObject.layer == _wallLayerIndex || (bool)collision.collider.GetComponent<InputComponent>())
         {
-            _rb2D.velocity = Vector2.zero;
+            _rb2D.linearVelocity = Vector2.zero;
             _trailRenderer.emitting = false;
             GetComponent<EnemyComponent>().enabled= false;
             _dieByWall = true;
@@ -47,11 +47,11 @@ public class ThownEnemyComponent : MonoBehaviour
         _animator.SetBool("Death", _dieByWall);
         if (_canMove) Move();
         
-        Debug.Log("speed" + _rb2D.velocity);
+        Debug.Log("speed" + _rb2D.linearVelocity);
     }
     private void Move()
     {
-        _rb2D.velocity = new Vector2(_movSpeed * _direction, _rb2D.velocity.y);
+        _rb2D.linearVelocity = new Vector2(_movSpeed * _direction, _rb2D.linearVelocity.y);
     }
 
     public void SetSpin(float otherScale)

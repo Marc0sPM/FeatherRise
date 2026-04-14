@@ -20,7 +20,7 @@ public class FeatherComponent : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        //Mirar para cambiarlo con la posición relativa del jugador
+        //Mirar para cambiarlo con la posiciï¿½n relativa del jugador
        
         _camera = Camera.main;
         _myRigidBody = GetComponentInParent<Rigidbody2D>();
@@ -29,7 +29,7 @@ public class FeatherComponent : MonoBehaviour
         Vector3 direction = _mousePosition - transform.position;
         Vector3 rotation = transform.position - _mousePosition;
 
-        _myRigidBody.velocity = new Vector2(direction.x, direction.y).normalized * _speed;
+        _myRigidBody.linearVelocity = new Vector2(direction.x, direction.y).normalized * _speed;
 
         float rot = Mathf.Atan2(rotation.y, rotation.x) * Mathf.Rad2Deg;
         _rotation = Quaternion.Euler(0, 0, rot + _featherRotation);

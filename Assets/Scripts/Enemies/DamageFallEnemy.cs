@@ -33,19 +33,19 @@ public class DamageFallEnemy : MonoBehaviour
         
         if (!_touchingFloor)
         {
-            _yVelocity = rb.velocity.y;
+            _yVelocity = rb.linearVelocity.y;
             
         }
         else
         {
            if(_yVelocity < _allowedSpeedToDie)
            {
-                print(rb.velocity.y);
+                print(rb.linearVelocity.y);
                 GetComponent<LifeEnemyComponent>().TakeDamage(_dead);
             }
            else if (_yVelocity < _allowedSpeed)
            {
-                print(rb.velocity.y); 
+                print(rb.linearVelocity.y); 
                 GetComponent<LifeEnemyComponent>().TakeDamage(_damageFall);
                 _yVelocity = 0;
 
