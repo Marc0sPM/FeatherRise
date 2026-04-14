@@ -1,5 +1,6 @@
 public interface IPersistence
 {
+    void Open(string header);
     /// <summary>
     /// Guarda los datos serializados en el destino deseado. 
     /// </summary>
@@ -9,5 +10,5 @@ public interface IPersistence
     /// <summary>
     /// Cierra conexiones o streams de datos si es necesario. 
     /// </summary>
-    void Close();
+    void Close(string footer);
 }

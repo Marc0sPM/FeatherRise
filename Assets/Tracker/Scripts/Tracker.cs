@@ -46,7 +46,8 @@ public class Tracker : MonoBehaviour
         _currentSessionId = sessionId; // Genera un ID unico para la sesion actual
 
         Debug.Log($"[TRACKER] Inicializado. Sesion ID: {_currentSessionId}");
- 
+
+        _persistence.Open(_serializer.GetHeader()); 
         TrackEvent(new Session_Start()); // Trackeamos evento de inicio de sesion
         StartCoroutine(AutoFlushCoroutine());
     }
@@ -118,7 +119,7 @@ public class Tracker : MonoBehaviour
         if(_persistence != null)
         {
             // Cerramos conexiones o streams si es necesario
-            _persistence.Close();
+            _persistence.Close(_serializer.GetFooter());
         }
         
     }

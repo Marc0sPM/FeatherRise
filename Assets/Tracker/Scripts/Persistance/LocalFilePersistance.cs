@@ -18,8 +18,13 @@ public class LocalFilePersistence : IPersistence
         File.AppendAllText(filePath, data);
     }
 
-    public void Close()
+    public void Close(string footer)
     {
+        File.AppendAllText(filePath, footer); 
         Debug.Log("[Tracker] Archivo cerrado en disco.");
+    }
+    public void Open(string header)
+    {
+        File.AppendAllText(filePath, header); 
     }
 }

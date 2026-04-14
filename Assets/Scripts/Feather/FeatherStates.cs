@@ -16,8 +16,6 @@ public class FeatherStates : MonoBehaviour
 
     private void EnterState(FeatherState state)
     {
-
-        
         switch (state)
         {
             case FeatherState.FEATHER:
@@ -78,11 +76,20 @@ public class FeatherStates : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(GameManager.Instance.FeatherCant <= 0 && Input.GetButtonDown("Feather Return") && _currentState == FeatherState.PLATFORM)
+        if(Input.GetButtonDown("Feather Return"))
         {
-            _nextState = FeatherState.RETURN;
+            if (GameManager.Instance.FeatherCant <= 0 && _currentState == FeatherState.PLATFORM)
+            {
+                _nextState = FeatherState.RETURN;
+                Tracker.Instance.TrackEvent(new Feather_Recall_Attempt(true));
+            }
+            else
+            {
+                Tracker.Instance.TrackEvent(new Feather_Recall_Attempt(false));
+            }
         }
-        if(_nextState != _currentState)
+        
+        if (_nextState != _currentState)
         {
             if (_nextState == FeatherState.PLATFORM) FreezeAutoReturn(); //Sirve para desactivar el Return que tiene en player en FeatherRange
             _currentState = _nextState;

@@ -31,4 +31,14 @@ public class JSONSerializer : ISerializer
 
         return sb.ToString();
     }
+
+    public string GetHeader()
+    {
+        return "[\n"; 
+    }
+
+    public string GetFooter()
+    {
+        return "\n]"; 
+    }
 }
