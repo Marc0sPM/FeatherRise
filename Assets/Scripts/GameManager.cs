@@ -22,6 +22,7 @@ public class GameManager : MonoBehaviour
     [SerializeField]
     private int _feathersCant; // Amount of feather that can be shot
     public  int FeatherCant { get { return _feathersCant; } }
+    public int maxFeather = 0; 
 
     public int _souls = 3;
     public int _soul1;

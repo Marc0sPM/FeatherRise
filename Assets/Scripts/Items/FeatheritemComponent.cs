@@ -47,6 +47,7 @@ public class FeatheritemComponent : MonoBehaviour
         {
             SoundComponent.Instance.PlaySound(SoundComponent.Instance._pickItem);
             GameManager.Instance.AddFeather();
+            GameManager.Instance.maxFeather++; 
             Destroy(gameObject);
         }
     }

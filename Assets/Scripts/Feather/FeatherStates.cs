@@ -81,11 +81,6 @@ public class FeatherStates : MonoBehaviour
             if (GameManager.Instance.FeatherCant <= 0 && _currentState == FeatherState.PLATFORM)
             {
                 _nextState = FeatherState.RETURN;
-                Tracker.Instance.TrackEvent(new Feather_Recall_Attempt(true));
-            }
-            else
-            {
-                Tracker.Instance.TrackEvent(new Feather_Recall_Attempt(false));
             }
         }
         

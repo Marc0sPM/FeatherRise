@@ -11,7 +11,6 @@ public class FeatherThrowComponent : MonoBehaviour
     //Instancia publica del propio player para pasar posicion constante para el Return de la pluma
     [SerializeField] private GameObject _featherPrefab;
     public Transform spawnPoint;
-
     // Start is called before the first frame update
     void Start()
     {

@@ -29,6 +29,7 @@ public class InputComponent : MonoBehaviour
 
     float _nextAttackTime = 0f;
     [SerializeField] private LayerMask _interactuableLayer;
+    private bool _isRecalling = false; 
     
     // Start is called before the first frame update
     void Start()
@@ -138,6 +139,26 @@ public class InputComponent : MonoBehaviour
         if (Input.GetButtonDown("Cancel"))
         {
             _myUIManager.Pause();
+        }
+        if(GameManager.Instance.FeatherCant >= GameManager.Instance.maxFeather)
+        {
+            _isRecalling = false; 
+        }
+
+        if (Input.GetButtonDown("Feather Return"))
+        {
+            if(_isRecalling)
+            {
+                Tracker.Instance.TrackEvent(new Feather_Recall_Attempt(false));
+                return; 
+            }
+            bool isSuccessful = GameManager.Instance.FeatherCant <= 0;
+            Tracker.Instance.TrackEvent(new Feather_Recall_Attempt(isSuccessful));
+
+            if(isSuccessful)
+            {
+                _isRecalling = true; 
+            }
         }
        
 
