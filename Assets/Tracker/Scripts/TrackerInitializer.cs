@@ -1,4 +1,3 @@
-using UnityEditor;
 using UnityEngine;
 
 public class TrackerInitializer : MonoBehaviour
@@ -20,9 +19,10 @@ public class TrackerInitializer : MonoBehaviour
         // Inicilizamos el tracker con el serializador y el sistema de persistencia deseados.
         ISerializer mSerializer = chooseSerializer();
 
-        IPersistence mPersistence = choosePersistence(); 
+        string sessionId = System.Guid.NewGuid().ToString();
+        IPersistence mPersistence = choosePersistence(sessionId); 
 
-        Tracker.Instance.Init(mSerializer, mPersistence);
+        Tracker.Instance.Init(mSerializer, mPersistence, sessionId);
 
     }
 
@@ -39,13 +39,16 @@ public class TrackerInitializer : MonoBehaviour
         }
     }
 
-    private IPersistence choosePersistence() 
+    /// <summary>
+    /// Crea la clase de persitencia deaseada a partir de P_type
+    /// </summary>
+    /// <param name="sessionId">Identidifador unico de sesion</param>
+    private IPersistence choosePersistence(string sessionId) 
     {
-        string tempSessionId = System.Guid.NewGuid().ToString();
         switch (persistanceType) {
             case P_type.LOCAL_FILE:
             default: // por defecto archivo local
-                return new LocalFilePersistence(tempSessionId);
+                return new LocalFilePersistence(sessionId);
         } 
     } 
 

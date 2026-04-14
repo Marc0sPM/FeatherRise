@@ -10,6 +10,7 @@ public class Tracker : MonoBehaviour
     // Dependencias para serialización y persistencia de datos
     private ISerializer _serializer;
     private IPersistence _persistence;
+    private bool _isFirstFlush = true; 
 
     // Cola de eventos a ser procesados
     private Queue<TrackerEvent> _eventQueue = new Queue<TrackerEvent>();   
@@ -36,15 +37,17 @@ public class Tracker : MonoBehaviour
     /// </summary>
     /// <param name="ser">El serializador a utilizar</param>
     /// <param name="pers">La implementación de persistencia a utilizar</param>
-    public void Init(ISerializer ser, IPersistence pers)
+    /// <param name="sessionId">Identificador unico de sesion</param>
+    public void Init(ISerializer ser, IPersistence pers, string sessionId)
     {
         _serializer = ser;
         _persistence = pers;
 
-        _currentSessionId = System.Guid.NewGuid().ToString(); // Genera un ID unico para la sesion actual
+        _currentSessionId = sessionId; // Genera un ID unico para la sesion actual
 
         Debug.Log($"[TRACKER] Inicializado. Sesion ID: {_currentSessionId}");
-
+ 
+        TrackEvent(new Session_Start()); // Trackeamos evento de inicio de sesion
         StartCoroutine(AutoFlushCoroutine());
     }
 
@@ -79,8 +82,9 @@ public class Tracker : MonoBehaviour
         try
         {
             // Serializamos y guardamos los datos
-            string data = _serializer.Serialize(eventsToFlush);
+            string data = _serializer.Serialize(eventsToFlush, _isFirstFlush);
             _persistence.Save(data);
+            _isFirstFlush = false; 
         } 
         catch (System.Exception ex)
         {
@@ -108,6 +112,7 @@ public class Tracker : MonoBehaviour
    
     private void OnApplicationQuit()
     {
+        TrackEvent(new Session_End()); // Trackeamos evento de fin de sesion
         // Vaciamos por ultima vez 
         Flush();
         if(_persistence != null)

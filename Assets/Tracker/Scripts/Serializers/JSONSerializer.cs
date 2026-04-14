@@ -4,32 +4,30 @@ using System.Text;
 
 public class JSONSerializer : ISerializer
 {
-    public string Serialize(List<TrackerEvent> events)
+    public string Serialize(List<TrackerEvent> events, bool isFirstBatch)
     {
         StringBuilder sb = new StringBuilder();
-        
-        // Abrimos el array JSON
-        sb.AppendLine("["); 
+
+        // Si no es el primer volcado, separamos el lote anterior de este con una coma
+        if (!isFirstBatch)
+        {
+            sb.AppendLine(",");
+        }
+
+        sb.AppendLine("  ["); // Abre el array de este lote específico
 
         for (int i = 0; i < events.Count; i++)
         {
-            // JsonUtility sí funciona bien si le pasamos el objeto individual
             string jsonEvent = JsonUtility.ToJson(events[i]);
-            sb.Append("  ").Append(jsonEvent);
+            sb.Append("    ").Append(jsonEvent);
 
-            // Añadimos una coma si no es el último elemento
             if (i < events.Count - 1)
-            {
                 sb.AppendLine(",");
-            }
             else
-            {
                 sb.AppendLine();
-            }
         }
 
-        // Cerramos el array JSON
-        sb.AppendLine("]");
+        sb.Append("  ]"); // Cierra el array de este lote
 
         return sb.ToString();
     }
