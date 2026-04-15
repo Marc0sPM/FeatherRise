@@ -5,10 +5,10 @@ public class LocalFilePersistence : IPersistence
 {
     private string filePath;
 
-    public LocalFilePersistence(string sessionId)
+    public LocalFilePersistence(string sessionId, string fileExtension)
     {
         string date = System.DateTime.Now.ToString("yyyyMMdd_HHmmss");
-        string fileName = $"telemetry_{sessionId}_{date}.json";
+        string fileName = $"telemetry_{sessionId}_{date}" + fileExtension;
         filePath = Path.Combine(Application.persistentDataPath, fileName);
     }
 

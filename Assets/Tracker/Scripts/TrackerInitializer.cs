@@ -4,7 +4,8 @@ public class TrackerInitializer : MonoBehaviour
 {
     public enum S_type
     {
-        JSON
+        JSON,
+        CSV
     };
 
     public enum P_type
@@ -14,6 +15,8 @@ public class TrackerInitializer : MonoBehaviour
     [Header("Ajustes de inicializacion")]
     public S_type serializerType;
     public P_type persistanceType;
+    // Extension para el archivo de guardado
+    private string _fileExtension; 
     void Start()
     {
         // Inicilizamos el tracker con el serializador y el sistema de persistencia deseados.
@@ -33,8 +36,12 @@ public class TrackerInitializer : MonoBehaviour
     {
 
         switch (serializerType) {
+            case S_type.CSV:
+                _fileExtension = ".csv"; 
+                return new CSVSerializer();
             case S_type.JSON:
-            default:    // por defecto JSON, cuando haya mas tendra sentido
+            default:    // por defecto JSON
+                _fileExtension = ".json"; 
                 return new JSONSerializer();
         }
     }
@@ -48,7 +55,7 @@ public class TrackerInitializer : MonoBehaviour
         switch (persistanceType) {
             case P_type.LOCAL_FILE:
             default: // por defecto archivo local
-                return new LocalFilePersistence(sessionId);
+                return new LocalFilePersistence(sessionId, _fileExtension);
         } 
     } 
 
