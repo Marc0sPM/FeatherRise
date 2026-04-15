@@ -31,15 +31,21 @@ public class Level_Start : TrackerEvent
     }
 }
 
-
+public enum LevelResult
+{
+    Completed, 
+    Quit
+}
 
 [System.Serializable]
 public class Level_End : TrackerEvent
 {
     public int level_id;
+    public string result; 
 
-    public Level_End(int level_id) : base()
+    public Level_End(int level_id, LevelResult result) : base()
     {
         this.level_id = level_id;
+        this.result = result.ToString().ToLower();
     }
 }
