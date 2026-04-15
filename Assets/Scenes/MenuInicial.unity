@@ -929,8 +929,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c779e65cf3b693944989c833022891c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  serializerType: 0
-  persistanceType: 0
+  serializerType: 1
+  persistanceType: 1
+  firebaseDatabaseUrl: https://featherrise-telemetry-p3-default-rtdb.europe-west1.firebasedatabase.app/
 --- !u!114 &364805609
 MonoBehaviour:
   m_ObjectHideFlags: 0
