@@ -1,31 +1,27 @@
 using UnityEngine;
 
 // --------------------------------------------------------
-// EVENTOS DE JUGABILIDAD (FEATHER RISE)
+// EVENTOS DE JUGABILIDAD
 // --------------------------------------------------------
 
 /// <summary>
-/// M4.2 y M4.3 - Registra cuando el jugador alcanza un checkpoint. 
-/// Vital para calcular el tiempo entre puntos y asociar muertes a tramos concretos.
+/// M4.2 y M4.3 - Registra cuando el jugador alcanza un checkpoint.
 /// </summary>
 [System.Serializable]
 public class Checkpoint_Reached : TrackerEvent
 {
     public float pos_x;
     public float pos_y;
-    public int level_id;
 
-    public Checkpoint_Reached(float pos_x, float pos_y, int level_id) : base()
+    public Checkpoint_Reached(float pos_x, float pos_y) : base()
     {
         this.pos_x = pos_x;
         this.pos_y = pos_y;
-        this.level_id = level_id;
     }
 }
 
 /// <summary>
 /// M4.3 - Registra la muerte del jugador.
-/// Se guardan las coordenadas para hacer mapas de calor y la causa para saber qué los mata.
 /// </summary>
 [System.Serializable]
 public class Player_Death : TrackerEvent
@@ -33,20 +29,17 @@ public class Player_Death : TrackerEvent
     public float pos_x;
     public float pos_y;
     public string cause_of_death;
-    public int level_id;
 
-    public Player_Death(float x, float y, string cause, int level) : base()
+    public Player_Death(float x, float y, string cause) : base()
     {
         this.pos_x = x;
         this.pos_y = y;
         this.cause_of_death = cause;
-        this.level_id = level;
     }
 }
 
 /// <summary>
 /// Hipótesis 1 - Gestión de recursos y fricción de controles.
-/// Evalúa si el jugador intenta recoger plumas y falla (ej. pulsar 'W' por error al saltar).
 /// </summary>
 [System.Serializable]
 public class Feather_Recall_Attempt : TrackerEvent
@@ -61,7 +54,6 @@ public class Feather_Recall_Attempt : TrackerEvent
 
 /// <summary>
 /// M5.1 - Interacción con cofres. 
-/// Esencial para cruzar session_id únicos que han abierto el cofre del Nivel 2.2.
 /// </summary>
 [System.Serializable]
 public class Chest_Opened : TrackerEvent
@@ -95,7 +87,7 @@ public class Player_Attack : TrackerEvent
     public Player_Attack(AttackType attackType, bool enemyHit) : base()
     {
         // Convertimos el enum a string para que en el JSON ponga "Ground" o "Aerial" y no 0 o 1
-        this.attack_type = attackType.ToString();
+        this.attack_type = attackType.ToString().ToLower();
         this.enemy_hit = enemyHit;
     }
 }

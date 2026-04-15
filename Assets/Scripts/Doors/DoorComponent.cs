@@ -22,6 +22,8 @@ public class DoorComponent : MonoBehaviour
     //metodo publico para cambiar el nivel al interactuar con la puerta
     public void CambiarNivel(int _index)
     {
+        int levelId = SceneManager.GetActiveScene().buildIndex;
+        Tracker.Instance.TrackEvent(new Level_End(levelId)); 
 
         SceneManager.LoadScene(_index);
         GameManager.Instance.Featherslvl2();

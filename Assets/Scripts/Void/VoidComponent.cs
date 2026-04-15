@@ -22,8 +22,7 @@ public class VoidComponent : MonoBehaviour
                 GameManager.Instance.EvalueG();
             }
 
-            int levelId = SceneManager.GetActiveScene().buildIndex;
-            Tracker.Instance.TrackEvent(new Player_Death(player.transform.position.x, player.transform.position.y, "void", levelId));
+            Tracker.Instance.TrackEvent(new Player_Death(player.transform.position.x, player.transform.position.y, "void"));
         }
         if ((bool)collision.gameObject.GetComponent<LifeEnemyComponent>())
         {

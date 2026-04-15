@@ -88,8 +88,7 @@ public class GameManager : MonoBehaviour
     public void Checkpoint(Vector2 respawnP)
     {
         _respawnPoint = respawnP;
-        int levelId = SceneManager.GetActiveScene().buildIndex;
-        Tracker.Instance.TrackEvent(new Checkpoint_Reached(_respawnPoint.x, _respawnPoint.y, levelId));
+        Tracker.Instance.TrackEvent(new Checkpoint_Reached(_respawnPoint.x, _respawnPoint.y));
     }
     public void AddFeather()
     {
@@ -190,12 +189,12 @@ public class GameManager : MonoBehaviour
                 if ((bool)enemy.GetComponent<SpinComponent>())
                 {
                     int levelId = SceneManager.GetActiveScene().buildIndex;
-                    Tracker.Instance.TrackEvent(new Player_Death(_player.transform.position.x, _player.transform.position.x, "enemy_mele", levelId));
+                    Tracker.Instance.TrackEvent(new Player_Death(_player.transform.position.x, _player.transform.position.x, "enemy_mele"));
                 }
                 else if ((bool)enemy.GetComponent<ProyectileComponent>())
                 {
                     int levelId = SceneManager.GetActiveScene().buildIndex;
-                    Tracker.Instance.TrackEvent(new Player_Death(_player.transform.position.x, _player.transform.position.x, "enemy_range", levelId));
+                    Tracker.Instance.TrackEvent(new Player_Death(_player.transform.position.x, _player.transform.position.x, "enemy_range"));
                 }
             }
             
@@ -237,7 +236,8 @@ public class GameManager : MonoBehaviour
         // Trackeo de Checkpoint_Reached
 
         int levelId = SceneManager.GetActiveScene().buildIndex;
-        Tracker.Instance.TrackEvent(new Checkpoint_Reached(_respawnPoint.x, _respawnPoint.y, levelId));
+        Tracker.Instance.TrackEvent(new Level_Start(levelId)); 
+        Tracker.Instance.TrackEvent(new Checkpoint_Reached(_respawnPoint.x, _respawnPoint.y));
     }
 
     // Update is called once per frame
