@@ -179,6 +179,8 @@ public class UIManager : MonoBehaviour
     }
     public void Quit()
     {
+        int levelId = SceneManager.GetActiveScene().buildIndex;
+        Tracker.Instance.TrackEvent(new Level_End(levelId, LevelResult.Quit));
         SceneManager.LoadScene(0);
     }
     #endregion

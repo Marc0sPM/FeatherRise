@@ -23,7 +23,7 @@ public class DoorComponent : MonoBehaviour
     public void CambiarNivel(int _index)
     {
         int levelId = SceneManager.GetActiveScene().buildIndex;
-        Tracker.Instance.TrackEvent(new Level_End(levelId)); 
+        Tracker.Instance.TrackEvent(new Level_End(levelId, LevelResult.Completed)); 
 
         SceneManager.LoadScene(_index);
         GameManager.Instance.Featherslvl2();
