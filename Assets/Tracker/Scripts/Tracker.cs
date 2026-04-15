@@ -1,5 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.Concurrent;
+using System.Threading.Tasks;
 using UnityEngine;
 
 public class Tracker : MonoBehaviour
@@ -13,7 +15,7 @@ public class Tracker : MonoBehaviour
     private bool _isFirstFlush = true; 
 
     // Cola de eventos a ser procesados
-    private Queue<TrackerEvent> _eventQueue = new Queue<TrackerEvent>();   
+    private ConcurrentQueue<TrackerEvent> _eventQueue = new ConcurrentQueue<TrackerEvent>();   
     // Identificador único para cada sesión de juego
     private string _currentSessionId; 
 
@@ -69,32 +71,59 @@ public class Tracker : MonoBehaviour
     /// <summary>
     /// Procesa la cola de eventos, serializa los datos y los guarda utilizando las dependencias configuradas.
     /// </summary>
-    public void Flush()
+    public void Flush(bool forceSynchronous = false)
     {
-        if(_eventQueue.Count == 0) return; 
+        if(_eventQueue.IsEmpty) return; 
 
         // Vaciamos cola a una lista
         List<TrackerEvent> eventsToFlush = new List<TrackerEvent>();
-        while(_eventQueue.Count > 0)
+        while(_eventQueue.TryDequeue(out TrackerEvent e))
         {
-            eventsToFlush.Add(_eventQueue.Dequeue());
+            eventsToFlush.Add(e);
         }
-
+        string data = ""; 
         try
         {
             // Serializamos y guardamos los datos
-            string data = _serializer.Serialize(eventsToFlush, _isFirstFlush);
+            data = _serializer.Serialize(eventsToFlush, _isFirstFlush);
             _persistence.Save(data);
             _isFirstFlush = false; 
         } 
         catch (System.Exception ex)
         {
             Debug.LogError($"[TRACKER] Error al guardar datos: {ex.Message}");
-            foreach(var e in eventsToFlush)
+            ReturnEventsToQueue(eventsToFlush); 
+        }
+
+        if (forceSynchronous) 
+        {
+            // Si el juego se esta cerrando, no se pueden usar hilos secundarios.
+            // Windows los mata antes de acabar
+            try { _persistence.Save(data); }
+            catch { ReturnEventsToQueue(eventsToFlush); }
+        }
+        else
+        {
+            // Lanzamos hilo secundario
+            Task.Run(() =>
             {
-                // Si falla el guardado devolvemos a la cola
-                _eventQueue.Enqueue(e);
-            }
+                try { _persistence.Save(data); }
+                catch (System.Exception ex)
+                {
+                    Debug.LogError($"[TRACKER] Error asíncrono al escribir en disco: {ex.Message}");
+                    ReturnEventsToQueue(eventsToFlush);
+                }
+            });
+        }
+    }
+    /// <summary>
+    /// Devuelve a la cola los eventos de la lista
+    /// </summary>
+    private void ReturnEventsToQueue(List<TrackerEvent> failedEvents)
+    {
+        foreach (var e in failedEvents)
+        {
+            _eventQueue.Enqueue(e);
         }
     }
 
@@ -107,15 +136,15 @@ public class Tracker : MonoBehaviour
         while(true)
         {
             yield return new WaitForSeconds(autoFlushInterval);
-            Flush();
+            Flush(false);
         }
     }
    
     private void OnApplicationQuit()
     {
         TrackEvent(new Session_End()); // Trackeamos evento de fin de sesion
-        // Vaciamos por ultima vez 
-        Flush();
+        // Vaciamos por ultima vez , forzamos a que sea sincrono
+        Flush(true);
         if(_persistence != null)
         {
             // Cerramos conexiones o streams si es necesario
