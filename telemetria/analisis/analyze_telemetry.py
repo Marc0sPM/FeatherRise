@@ -271,6 +271,37 @@ def metric_m11_feather_recall_failure(df: pd.DataFrame) -> MetricResult:
                           "intento_n", "fallo",
                           "tasa_fallo_acum", "tasa_fallo_movil"]].to_dict(orient="records")
 
+    # Firma de aprendizaje por sesión: interpolamos la curva de fallo
+    # acumulado a 10 puntos en el rango 0-100 % del progreso relativo de
+    # cada sesión. Esto normaliza el eje X (sesiones de distinta duración
+    # se comparan sobre la misma base) y da un vector 10-D que sirve de
+    # input para el clustering en la visualización.
+    N_SIGNATURE_POINTS = 10
+    firmas = []
+    progress_grid = np.linspace(0, 100, N_SIGNATURE_POINTS)
+    for sid, grp in sub.groupby("session_id"):
+        grp = grp.sort_values("intento_n").reset_index(drop=True)
+        n = len(grp)
+        if n < 2:
+            # Con 1 solo intento no se puede construir firma significativa
+            firmas.append({
+                "session_id": sid,
+                "n_intentos": int(n),
+                "firma": [float(grp["fallo"].mean()) * 100] * N_SIGNATURE_POINTS,
+            })
+            continue
+        # Eje X real: % de progreso de cada intento (0 = primero, 100 = último)
+        x_real = (grp["intento_n"].values - 1) / (n - 1) * 100
+        # Interpolamos la tasa MÓVIL (ya suavizada) a la grid canónica
+        y_interp = np.interp(progress_grid,
+                             x_real,
+                             grp["tasa_fallo_movil"].values * 100)
+        firmas.append({
+            "session_id": sid,
+            "n_intentos": int(n),
+            "firma": [round(float(v), 2) for v in y_interp],
+        })
+
     # Comparación primer tercio vs último tercio de los intentos de cada
     # sesión: si hay aprendizaje, la tasa de fallo bajaría
     aprendizaje = []
@@ -301,6 +332,8 @@ def metric_m11_feather_recall_failure(df: pd.DataFrame) -> MetricResult:
             "por_sesion": by_session.to_dict(orient="records"),
             "aprendizaje_primer_vs_ultimo_tercio": aprendizaje,
             "serie_temporal": serie_temporal,
+            "firmas_aprendizaje": firmas,
+            "firma_progress_grid": progress_grid.tolist(),
         },
     )
 
@@ -614,78 +647,206 @@ def _setup_style() -> None:
     plt.rcParams["savefig.bbox"] = "tight"
 
 
+def _kmeans_naive(X: np.ndarray, k: int,
+                  n_iters: int = 100, seed: int = 42
+                  ) -> tuple[np.ndarray, np.ndarray]:
+    """K-means simple en numpy puro, sin dependencias externas.
+
+    No pretende competir con sklearn, pero es suficiente para clusterizar
+    unas decenas/centenares de firmas de aprendizaje (vectores de 10 dims).
+    Inicialización tipo k-means++ ligera: primer centroide al azar y cada
+    siguiente sesgado hacia puntos lejanos de los ya elegidos.
+    """
+    n = len(X)
+    if k >= n:
+        # Cada punto es su propio cluster
+        return np.arange(n), X.copy()
+    if k <= 1:
+        return np.zeros(n, dtype=int), X.mean(axis=0, keepdims=True)
+
+    rng = np.random.default_rng(seed)
+
+    # k-means++ simplificado para centroides iniciales
+    centroid_idx = [int(rng.integers(n))]
+    for _ in range(k - 1):
+        diffs = X[:, None] - X[centroid_idx][None]
+        min_d2 = (diffs ** 2).sum(axis=2).min(axis=1)
+        if min_d2.sum() == 0:
+            centroid_idx.append(int(rng.integers(n)))
+            continue
+        probs = min_d2 / min_d2.sum()
+        centroid_idx.append(int(rng.choice(n, p=probs)))
+    centroids = X[centroid_idx].astype(float).copy()
+
+    labels = np.zeros(n, dtype=int)
+    for _ in range(n_iters):
+        dists = np.linalg.norm(X[:, None] - centroids[None], axis=2)
+        new_labels = dists.argmin(axis=1)
+        if np.array_equal(new_labels, labels):
+            break
+        labels = new_labels
+        for j in range(k):
+            mask = labels == j
+            if mask.any():
+                centroids[j] = X[mask].mean(axis=0)
+    return labels, centroids
+
+
+def _auto_n_clusters(n_sessions: int) -> int:
+    """Número de clusters automático en función del nº de sesiones.
+
+    - Con 5 o menos sesiones: cada una es su propio cluster (no agrupamos).
+    - Con más: k = clip(round(√n), 3, 8), que da curvas legibles sin perder
+      granularidad (ej: 10→3, 16→4, 25→5, 36→6, 49→7, 64+→8).
+    """
+    if n_sessions <= 5:
+        return n_sessions
+    k = int(round(np.sqrt(n_sessions)))
+    return max(3, min(8, k))
+
+def luminance(color):
+    """Calcula la luminancia percibida de un color RGB (0-255)."""
+    r, g, b = color
+    return 0.2126*r + 0.7152*g + 0.0722*b
+
 def plot_feather_recall(m11: MetricResult, out: Path) -> None:
-    """Visualización temporal de la métrica M1.1 — versión curva.
+    """Visualización de M1.1 con agrupación automática por similitud.
+
+    En vez de una línea por sesión (ilegible a partir de ~10 sesiones),
+    agrupa las sesiones con firmas de aprendizaje parecidas y dibuja la
+    curva mediana de cada grupo con una banda IQR (25-75 %). El número
+    de grupos depende del número de sesiones (ver `_auto_n_clusters`).
 
     Dos paneles:
-        1. Secuencia cronológica de intentos por sesión (verde=éxito, rojo=fallo).
-        2. Curva de % de fallo móvil (ventana = 5 intentos) para cada sesión.
-           Una pendiente descendente indica aprendizaje; una pendiente
-           ascendente o plana indica que no lo hay.
+        1. Barras apiladas: cuántas sesiones tiene cada grupo.
+        2. Curva mediana por grupo + banda IQR, sobre el eje de progreso
+           relativo (0-100 % de los intentos de cada sesión).
     """
-    serie = m11.detail.get("serie_temporal", [])
-    if not serie:
+    firmas = m11.detail.get("firmas_aprendizaje", [])
+    grid = m11.detail.get("firma_progress_grid", [])
+    if not firmas or not grid:
         return
 
-    df = pd.DataFrame(serie)
-    if df.empty:
+    # Filtramos sesiones con al menos 2 intentos (firma no constante trivial)
+    firmas_valid = [f for f in firmas if f["n_intentos"] >= 2]
+    if not firmas_valid:
         return
 
-    sessions = list(df["session_id"].unique())
-    palette = sns.color_palette("tab10", n_colors=len(sessions))
-    color_map = {sid: palette[i] for i, sid in enumerate(sessions)}
-    short = {sid: sid[:8] for sid in sessions}
+    n_sessions = len(firmas_valid)
+    k = _auto_n_clusters(n_sessions)
+
+    # Matriz n_sesiones × 10 con las firmas
+    X = np.array([f["firma"] for f in firmas_valid], dtype=float)
+    labels, centroids = _kmeans_naive(X, k)
+
+    # Ordenamos los clusters por tasa media global de fallo (ascendente)
+    # para que los colores sean consistentes con la intensidad de problema
+    cluster_means = np.array([X[labels == c].mean() if (labels == c).any()
+                              else 0 for c in range(k)])
+    order = np.argsort(cluster_means)
+    old_to_new = {old: new for new, old in enumerate(order)}
+    labels_sorted = np.array([old_to_new[lbl] for lbl in labels])
+
+    # Características de cada cluster para las etiquetas
+    cluster_info = []
+    palette = sns.color_palette("RdYlGn_r", n_colors=max(k, 3))
+    filtered_palette = [c for c in palette if luminance(c) < 0.8]
+
+    # Filtramos colores muy claros (luminancia > 0.8) para que se vean bien sobre el fondo blanco
+    while len(filtered_palette) < k:
+        palette = sns.color_palette("RdYlGn_r", n_colors=len(palette) + 2)
+        filtered_palette = [c for c in palette if luminance(c) < 0.8]
+
+    palette = filtered_palette[:k]
+
+    for c in range(k):
+        mask = labels_sorted == c
+        if not mask.any():
+            continue
+        curves = X[mask]
+        firmas_c = [firmas_valid[i] for i in range(n_sessions) if mask[i]]
+        n_intentos_medios = np.mean([f["n_intentos"] for f in firmas_c])
+        # Usamos el promedio del primer tercio y último tercio de la curva
+        # (más robusto que los extremos puros, que pueden ser 0 por efecto
+        # de la media móvil con min_periods=1)
+        n_pts = curves.shape[1]
+        tercio = max(1, n_pts // 3)
+        inicio = curves[:, :tercio].mean()
+        final = curves[:, -tercio:].mean()
+        delta = final - inicio
+        if abs(delta) < 5:
+            perfil = "se mantiene"
+        elif delta < 0:
+            perfil = "mejora"
+        else:
+            perfil = "empeora"
+        cluster_info.append({
+            "cluster": c,
+            "n_sesiones": int(mask.sum()),
+            "n_intentos_medio": round(float(n_intentos_medios), 1),
+            "tasa_inicio_pct": round(float(inicio), 1),
+            "tasa_final_pct": round(float(final), 1),
+            "delta_pct": round(float(delta), 1),
+            "perfil": perfil,
+            "color": palette[c],
+        })
 
     fig, axes = plt.subplots(2, 1, figsize=(12, 9),
-                             gridspec_kw={"height_ratios": [1, 1.2]})
+                             gridspec_kw={"height_ratios": [1, 1.8]})
 
-    # ----- Panel 1: secuencia cronológica de intentos -----
+    # ----- Panel 1: barras con el nº de sesiones por grupo -----
     ax = axes[0]
-    for i, sid in enumerate(sessions):
-        grp = df[df["session_id"] == sid].sort_values("intento_n")
-        ax.plot(grp["intento_n"], np.full(len(grp), i),
-                color=color_map[sid], linewidth=1.0, alpha=0.4, zorder=1)
-        for _, row in grp.iterrows():
-            color = "#D62246" if row["fallo"] == 1 else "#4C9F70"
-            ax.scatter(row["intento_n"], i, c=color, s=180,
-                       edgecolor="black", linewidth=0.7, zorder=2)
-    ax.set_yticks(range(len(sessions)))
-    ax.set_yticklabels([f"{short[s]}  (n={int((df['session_id']==s).sum())})"
-                        for s in sessions])
-    ax.set_xlabel("Nº de intento de recall (orden cronológico)")
-    ax.set_ylabel("Sesión")
-    ax.set_title("Secuencia cronológica de intentos "
-                 "(verde = éxito · rojo = fallo)")
-    from matplotlib.lines import Line2D
-    legend_elems = [
-        Line2D([0], [0], marker="o", color="w",
-               markerfacecolor="#4C9F70", markeredgecolor="black",
-               markersize=12, label="Éxito"),
-        Line2D([0], [0], marker="o", color="w",
-               markerfacecolor="#D62246", markeredgecolor="black",
-               markersize=12, label="Fallo"),
-    ]
-    ax.legend(handles=legend_elems, loc="upper right", fontsize=10)
+    x_pos = np.arange(len(cluster_info))
+    bars = ax.bar(x_pos,
+                  [c["n_sesiones"] for c in cluster_info],
+                  color=[c["color"] for c in cluster_info],
+                  edgecolor="black", linewidth=0.8)
+    for b, ci in zip(bars, cluster_info):
+        label = (f"{ci['n_sesiones']} sesiones\n"
+                 f"{ci['tasa_inicio_pct']:.0f}% → "
+                 f"{ci['tasa_final_pct']:.0f}% ({ci['perfil']})")
+        ax.text(b.get_x() + b.get_width() / 2,
+                b.get_height() + 0.15,
+                label, ha="center", va="bottom", fontsize=10)
+    ax.set_xticks(x_pos)
+    ax.set_xticklabels([f"Grupo {i+1}" for i in range(len(cluster_info))])
+    ax.set_ylabel("Nº de sesiones")
+    ax.set_ylim(0,
+                max(c["n_sesiones"] for c in cluster_info) * 1.45 + 1)
+    modo = ("agrupación automática"
+            if n_sessions > 5
+            else "una curva por sesión (pocas sesiones)")
+    ax.set_title(f"Agrupación de sesiones por patrón de aprendizaje "
+                 f"({n_sessions} sesiones → {k} grupos · {modo})")
 
-    # ----- Panel 2: curva de % fallo móvil (ventana=5) -----
+    # ----- Panel 2: curva mediana + banda IQR por grupo -----
     ax = axes[1]
-    for sid in sessions:
-        grp = df[df["session_id"] == sid].sort_values("intento_n")
-        if len(grp) < 2:
+    for c in range(k):
+        mask = labels_sorted == c
+        if not mask.any():
             continue
-        ax.plot(grp["intento_n"], grp["tasa_fallo_movil"] * 100,
-                marker="o", color=color_map[sid],
-                label=short[sid], linewidth=2.5, markersize=8)
-    ax.set_xlabel("Nº de intento de recall")
+        curves = X[mask]
+        mediana = np.median(curves, axis=0)
+        q1 = np.percentile(curves, 25, axis=0)
+        q3 = np.percentile(curves, 75, axis=0)
+        color = palette[c]
+        n_in_cluster = int(mask.sum())
+        ax.fill_between(grid, q1, q3, color=color, alpha=0.18)
+        ax.plot(grid, mediana, marker="o", color=color, linewidth=2.5,
+                markersize=7,
+                label=f"Grupo {c+1}  ·  {n_in_cluster} sesión"
+                      f"{'es' if n_in_cluster != 1 else ''}")
+    ax.set_xlabel("Progreso dentro de la sesión (% de los intentos realizados)")
     ax.set_ylabel("% de fallo (media de los últimos 5 intentos)")
+    ax.set_xlim(0, 100)
     ax.set_ylim(-5, 105)
     ax.axhline(50, color="gray", linestyle=":", linewidth=1, alpha=0.7)
-    ax.set_title("Curva de aprendizaje · % de fallo a lo largo de la sesión\n"
-                 "(pendiente bajando = aprende · subiendo/plana = no aprende)")
-    ax.legend(title="Sesión", fontsize=10, loc="best")
+    ax.set_title("Curvas medianas de aprendizaje por grupo ")
+    ax.legend(loc="best", fontsize=10)
 
-    fig.suptitle("M1.1 · Evolución temporal del recall de plumas",
-                 fontsize=15, y=1.00)
+    fig.suptitle("M1.1 · Evolución temporal del recall de plumas "
+                 "— agrupado por similitud",
+                 fontsize=14, y=1.00)
     fig.tight_layout()
     fig.savefig(out / "M1_1_feather_recall.png")
     plt.close(fig)

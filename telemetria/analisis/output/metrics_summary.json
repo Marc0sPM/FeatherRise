@@ -1,18 +1,30 @@
 {
   "M1.1": {
     "name": "Tasa de intentos de recogida fallidos",
-    "value": 0.2791,
+    "value": 0.284,
     "detail": {
-      "intentos_totales": 43,
-      "intentos_fallidos": 12,
-      "intentos_exitosos": 31,
-      "tasa_fallo_pct": 27.91,
+      "intentos_totales": 81,
+      "intentos_fallidos": 23,
+      "intentos_exitosos": 58,
+      "tasa_fallo_pct": 28.4,
       "por_sesion": [
+        {
+          "session_id": "27c6ca73-9d40-4f9e-bde3-c7223bbf6dc0",
+          "intentos": 16,
+          "fallos": 5,
+          "tasa_fallo": 0.3125
+        },
         {
           "session_id": "ad4b271a-21f6-49bc-800c-3355f610073b",
           "intentos": 18,
           "fallos": 5,
           "tasa_fallo": 0.2778
+        },
+        {
+          "session_id": "c0cfa5bf-88a4-46ab-a899-36c1a500332f",
+          "intentos": 22,
+          "fallos": 6,
+          "tasa_fallo": 0.2727
         },
         {
           "session_id": "ed5a11c2-74d0-4d9d-a710-e48b6562235b",
@@ -23,11 +35,25 @@
       ],
       "aprendizaje_primer_vs_ultimo_tercio": [
         {
+          "session_id": "27c6ca73-9d40-4f9e-bde3-c7223bbf6dc0",
+          "n_intentos": 16,
+          "tasa_fallo_primer_tercio": 0.6,
+          "tasa_fallo_ultimo_tercio": 0.2,
+          "delta": -0.4
+        },
+        {
           "session_id": "ad4b271a-21f6-49bc-800c-3355f610073b",
           "n_intentos": 18,
           "tasa_fallo_primer_tercio": 0.0,
           "tasa_fallo_ultimo_tercio": 0.0,
           "delta": 0.0
+        },
+        {
+          "session_id": "c0cfa5bf-88a4-46ab-a899-36c1a500332f",
+          "n_intentos": 22,
+          "tasa_fallo_primer_tercio": 0.2857,
+          "tasa_fallo_ultimo_tercio": 0.1429,
+          "delta": -0.1429
         },
         {
           "session_id": "ed5a11c2-74d0-4d9d-a710-e48b6562235b",
@@ -38,6 +64,150 @@
         }
       ],
       "serie_temporal": [
+        {
+          "session_id": "27c6ca73-9d40-4f9e-bde3-c7223bbf6dc0",
+          "timestamp": 1776613618,
+          "t_rel_s": 0,
+          "intento_n": 1,
+          "fallo": 0,
+          "tasa_fallo_acum": 0.0,
+          "tasa_fallo_movil": 0.0
+        },
+        {
+          "session_id": "27c6ca73-9d40-4f9e-bde3-c7223bbf6dc0",
+          "timestamp": 1776613644,
+          "t_rel_s": 26,
+          "intento_n": 2,
+          "fallo": 1,
+          "tasa_fallo_acum": 0.5,
+          "tasa_fallo_movil": 0.5
+        },
+        {
+          "session_id": "27c6ca73-9d40-4f9e-bde3-c7223bbf6dc0",
+          "timestamp": 1776613647,
+          "t_rel_s": 29,
+          "intento_n": 3,
+          "fallo": 1,
+          "tasa_fallo_acum": 0.6667,
+          "tasa_fallo_movil": 0.6667
+        },
+        {
+          "session_id": "27c6ca73-9d40-4f9e-bde3-c7223bbf6dc0",
+          "timestamp": 1776613648,
+          "t_rel_s": 30,
+          "intento_n": 4,
+          "fallo": 1,
+          "tasa_fallo_acum": 0.75,
+          "tasa_fallo_movil": 0.75
+        },
+        {
+          "session_id": "27c6ca73-9d40-4f9e-bde3-c7223bbf6dc0",
+          "timestamp": 1776613655,
+          "t_rel_s": 37,
+          "intento_n": 5,
+          "fallo": 0,
+          "tasa_fallo_acum": 0.6,
+          "tasa_fallo_movil": 0.6
+        },
+        {
+          "session_id": "27c6ca73-9d40-4f9e-bde3-c7223bbf6dc0",
+          "timestamp": 1776613660,
+          "t_rel_s": 42,
+          "intento_n": 6,
+          "fallo": 0,
+          "tasa_fallo_acum": 0.5,
+          "tasa_fallo_movil": 0.6
+        },
+        {
+          "session_id": "27c6ca73-9d40-4f9e-bde3-c7223bbf6dc0",
+          "timestamp": 1776613684,
+          "t_rel_s": 66,
+          "intento_n": 7,
+          "fallo": 0,
+          "tasa_fallo_acum": 0.4286,
+          "tasa_fallo_movil": 0.4
+        },
+        {
+          "session_id": "27c6ca73-9d40-4f9e-bde3-c7223bbf6dc0",
+          "timestamp": 1776613692,
+          "t_rel_s": 74,
+          "intento_n": 8,
+          "fallo": 0,
+          "tasa_fallo_acum": 0.375,
+          "tasa_fallo_movil": 0.2
+        },
+        {
+          "session_id": "27c6ca73-9d40-4f9e-bde3-c7223bbf6dc0",
+          "timestamp": 1776613717,
+          "t_rel_s": 99,
+          "intento_n": 9,
+          "fallo": 0,
+          "tasa_fallo_acum": 0.3333,
+          "tasa_fallo_movil": 0.0
+        },
+        {
+          "session_id": "27c6ca73-9d40-4f9e-bde3-c7223bbf6dc0",
+          "timestamp": 1776613721,
+          "t_rel_s": 103,
+          "intento_n": 10,
+          "fallo": 1,
+          "tasa_fallo_acum": 0.4,
+          "tasa_fallo_movil": 0.2
+        },
+        {
+          "session_id": "27c6ca73-9d40-4f9e-bde3-c7223bbf6dc0",
+          "timestamp": 1776613724,
+          "t_rel_s": 106,
+          "intento_n": 11,
+          "fallo": 0,
+          "tasa_fallo_acum": 0.3636,
+          "tasa_fallo_movil": 0.2
+        },
+        {
+          "session_id": "27c6ca73-9d40-4f9e-bde3-c7223bbf6dc0",
+          "timestamp": 1776613736,
+          "t_rel_s": 118,
+          "intento_n": 12,
+          "fallo": 1,
+          "tasa_fallo_acum": 0.4167,
+          "tasa_fallo_movil": 0.4
+        },
+        {
+          "session_id": "27c6ca73-9d40-4f9e-bde3-c7223bbf6dc0",
+          "timestamp": 1776613736,
+          "t_rel_s": 118,
+          "intento_n": 13,
+          "fallo": 0,
+          "tasa_fallo_acum": 0.3846,
+          "tasa_fallo_movil": 0.4
+        },
+        {
+          "session_id": "27c6ca73-9d40-4f9e-bde3-c7223bbf6dc0",
+          "timestamp": 1776613787,
+          "t_rel_s": 169,
+          "intento_n": 14,
+          "fallo": 0,
+          "tasa_fallo_acum": 0.3571,
+          "tasa_fallo_movil": 0.4
+        },
+        {
+          "session_id": "27c6ca73-9d40-4f9e-bde3-c7223bbf6dc0",
+          "timestamp": 1776613800,
+          "t_rel_s": 182,
+          "intento_n": 15,
+          "fallo": 0,
+          "tasa_fallo_acum": 0.3333,
+          "tasa_fallo_movil": 0.2
+        },
+        {
+          "session_id": "27c6ca73-9d40-4f9e-bde3-c7223bbf6dc0",
+          "timestamp": 1776613814,
+          "t_rel_s": 196,
+          "intento_n": 16,
+          "fallo": 0,
+          "tasa_fallo_acum": 0.3125,
+          "tasa_fallo_movil": 0.2
+        },
         {
           "session_id": "ad4b271a-21f6-49bc-800c-3355f610073b",
           "timestamp": 1776516896,
@@ -198,6 +368,204 @@
           "intento_n": 18,
           "fallo": 0,
           "tasa_fallo_acum": 0.2778,
+          "tasa_fallo_movil": 0.0
+        },
+        {
+          "session_id": "c0cfa5bf-88a4-46ab-a899-36c1a500332f",
+          "timestamp": 1776603217,
+          "t_rel_s": 0,
+          "intento_n": 1,
+          "fallo": 0,
+          "tasa_fallo_acum": 0.0,
+          "tasa_fallo_movil": 0.0
+        },
+        {
+          "session_id": "c0cfa5bf-88a4-46ab-a899-36c1a500332f",
+          "timestamp": 1776603240,
+          "t_rel_s": 23,
+          "intento_n": 2,
+          "fallo": 0,
+          "tasa_fallo_acum": 0.0,
+          "tasa_fallo_movil": 0.0
+        },
+        {
+          "session_id": "c0cfa5bf-88a4-46ab-a899-36c1a500332f",
+          "timestamp": 1776603241,
+          "t_rel_s": 24,
+          "intento_n": 3,
+          "fallo": 1,
+          "tasa_fallo_acum": 0.3333,
+          "tasa_fallo_movil": 0.3333
+        },
+        {
+          "session_id": "c0cfa5bf-88a4-46ab-a899-36c1a500332f",
+          "timestamp": 1776603245,
+          "t_rel_s": 28,
+          "intento_n": 4,
+          "fallo": 0,
+          "tasa_fallo_acum": 0.25,
+          "tasa_fallo_movil": 0.25
+        },
+        {
+          "session_id": "c0cfa5bf-88a4-46ab-a899-36c1a500332f",
+          "timestamp": 1776603249,
+          "t_rel_s": 32,
+          "intento_n": 5,
+          "fallo": 0,
+          "tasa_fallo_acum": 0.2,
+          "tasa_fallo_movil": 0.2
+        },
+        {
+          "session_id": "c0cfa5bf-88a4-46ab-a899-36c1a500332f",
+          "timestamp": 1776603263,
+          "t_rel_s": 46,
+          "intento_n": 6,
+          "fallo": 1,
+          "tasa_fallo_acum": 0.3333,
+          "tasa_fallo_movil": 0.4
+        },
+        {
+          "session_id": "c0cfa5bf-88a4-46ab-a899-36c1a500332f",
+          "timestamp": 1776603275,
+          "t_rel_s": 58,
+          "intento_n": 7,
+          "fallo": 0,
+          "tasa_fallo_acum": 0.2857,
+          "tasa_fallo_movil": 0.4
+        },
+        {
+          "session_id": "c0cfa5bf-88a4-46ab-a899-36c1a500332f",
+          "timestamp": 1776603288,
+          "t_rel_s": 71,
+          "intento_n": 8,
+          "fallo": 0,
+          "tasa_fallo_acum": 0.25,
+          "tasa_fallo_movil": 0.2
+        },
+        {
+          "session_id": "c0cfa5bf-88a4-46ab-a899-36c1a500332f",
+          "timestamp": 1776603309,
+          "t_rel_s": 92,
+          "intento_n": 9,
+          "fallo": 0,
+          "tasa_fallo_acum": 0.2222,
+          "tasa_fallo_movil": 0.2
+        },
+        {
+          "session_id": "c0cfa5bf-88a4-46ab-a899-36c1a500332f",
+          "timestamp": 1776603312,
+          "t_rel_s": 95,
+          "intento_n": 10,
+          "fallo": 1,
+          "tasa_fallo_acum": 0.3,
+          "tasa_fallo_movil": 0.4
+        },
+        {
+          "session_id": "c0cfa5bf-88a4-46ab-a899-36c1a500332f",
+          "timestamp": 1776603331,
+          "t_rel_s": 114,
+          "intento_n": 11,
+          "fallo": 1,
+          "tasa_fallo_acum": 0.3636,
+          "tasa_fallo_movil": 0.4
+        },
+        {
+          "session_id": "c0cfa5bf-88a4-46ab-a899-36c1a500332f",
+          "timestamp": 1776603332,
+          "t_rel_s": 115,
+          "intento_n": 12,
+          "fallo": 0,
+          "tasa_fallo_acum": 0.3333,
+          "tasa_fallo_movil": 0.4
+        },
+        {
+          "session_id": "c0cfa5bf-88a4-46ab-a899-36c1a500332f",
+          "timestamp": 1776603345,
+          "t_rel_s": 128,
+          "intento_n": 13,
+          "fallo": 0,
+          "tasa_fallo_acum": 0.3077,
+          "tasa_fallo_movil": 0.4
+        },
+        {
+          "session_id": "c0cfa5bf-88a4-46ab-a899-36c1a500332f",
+          "timestamp": 1776603355,
+          "t_rel_s": 138,
+          "intento_n": 14,
+          "fallo": 1,
+          "tasa_fallo_acum": 0.3571,
+          "tasa_fallo_movil": 0.6
+        },
+        {
+          "session_id": "c0cfa5bf-88a4-46ab-a899-36c1a500332f",
+          "timestamp": 1776603356,
+          "t_rel_s": 139,
+          "intento_n": 15,
+          "fallo": 0,
+          "tasa_fallo_acum": 0.3333,
+          "tasa_fallo_movil": 0.4
+        },
+        {
+          "session_id": "c0cfa5bf-88a4-46ab-a899-36c1a500332f",
+          "timestamp": 1776603357,
+          "t_rel_s": 140,
+          "intento_n": 16,
+          "fallo": 1,
+          "tasa_fallo_acum": 0.375,
+          "tasa_fallo_movil": 0.4
+        },
+        {
+          "session_id": "c0cfa5bf-88a4-46ab-a899-36c1a500332f",
+          "timestamp": 1776603358,
+          "t_rel_s": 141,
+          "intento_n": 17,
+          "fallo": 0,
+          "tasa_fallo_acum": 0.3529,
+          "tasa_fallo_movil": 0.4
+        },
+        {
+          "session_id": "c0cfa5bf-88a4-46ab-a899-36c1a500332f",
+          "timestamp": 1776603363,
+          "t_rel_s": 146,
+          "intento_n": 18,
+          "fallo": 0,
+          "tasa_fallo_acum": 0.3333,
+          "tasa_fallo_movil": 0.4
+        },
+        {
+          "session_id": "c0cfa5bf-88a4-46ab-a899-36c1a500332f",
+          "timestamp": 1776603367,
+          "t_rel_s": 150,
+          "intento_n": 19,
+          "fallo": 0,
+          "tasa_fallo_acum": 0.3158,
+          "tasa_fallo_movil": 0.2
+        },
+        {
+          "session_id": "c0cfa5bf-88a4-46ab-a899-36c1a500332f",
+          "timestamp": 1776603425,
+          "t_rel_s": 208,
+          "intento_n": 20,
+          "fallo": 0,
+          "tasa_fallo_acum": 0.3,
+          "tasa_fallo_movil": 0.2
+        },
+        {
+          "session_id": "c0cfa5bf-88a4-46ab-a899-36c1a500332f",
+          "timestamp": 1776603438,
+          "t_rel_s": 221,
+          "intento_n": 21,
+          "fallo": 0,
+          "tasa_fallo_acum": 0.2857,
+          "tasa_fallo_movil": 0.0
+        },
+        {
+          "session_id": "c0cfa5bf-88a4-46ab-a899-36c1a500332f",
+          "timestamp": 1776603441,
+          "t_rel_s": 224,
+          "intento_n": 22,
+          "fallo": 0,
+          "tasa_fallo_acum": 0.2727,
           "tasa_fallo_movil": 0.0
         },
         {
@@ -425,22 +793,100 @@
           "tasa_fallo_acum": 0.28,
           "tasa_fallo_movil": 0.0
         }
+      ],
+      "firmas_aprendizaje": [
+        {
+          "session_id": "27c6ca73-9d40-4f9e-bde3-c7223bbf6dc0",
+          "n_intentos": 16,
+          "firma": [
+            0.0,
+            61.11,
+            70.0,
+            60.0,
+            26.67,
+            6.67,
+            20.0,
+            40.0,
+            33.33,
+            20.0
+          ]
+        },
+        {
+          "session_id": "ad4b271a-21f6-49bc-800c-3355f610073b",
+          "n_intentos": 18,
+          "firma": [
+            0.0,
+            0.0,
+            0.0,
+            13.33,
+            31.11,
+            68.89,
+            80.0,
+            55.56,
+            17.78,
+            0.0
+          ]
+        },
+        {
+          "session_id": "c0cfa5bf-88a4-46ab-a899-36c1a500332f",
+          "n_intentos": 22,
+          "firma": [
+            0.0,
+            30.55,
+            33.33,
+            20.0,
+            40.0,
+            40.0,
+            40.0,
+            40.0,
+            20.0,
+            0.0
+          ]
+        },
+        {
+          "session_id": "ed5a11c2-74d0-4d9d-a710-e48b6562235b",
+          "n_intentos": 25,
+          "firma": [
+            0.0,
+            44.44,
+            46.67,
+            40.0,
+            26.67,
+            26.67,
+            40.0,
+            20.0,
+            20.0,
+            0.0
+          ]
+        }
+      ],
+      "firma_progress_grid": [
+        0.0,
+        11.11111111111111,
+        22.22222222222222,
+        33.33333333333333,
+        44.44444444444444,
+        55.55555555555556,
+        66.66666666666666,
+        77.77777777777777,
+        88.88888888888889,
+        100.0
       ]
     }
   },
   "M4.1": {
     "name": "Distribución espacial de muertes",
-    "value": 20,
+    "value": 26,
     "detail": {
-      "total_muertes": 20,
+      "total_muertes": 26,
       "por_causa": {
-        "void": 18,
-        "enemy_mele": 1,
-        "enemy_range": 1
+        "void": 23,
+        "enemy_range": 2,
+        "enemy_mele": 1
       },
       "por_nivel": {
-        "Nivel 2": 13,
-        "Nivel 1": 7
+        "Nivel 2": 16,
+        "Nivel 1": 10
       },
       "coordenadas": [
         {
@@ -602,17 +1048,65 @@
           "pos_y": 93.17677307128906,
           "cause_of_death": "void",
           "nivel_label": "Nivel 2"
+        },
+        {
+          "session_id": "c0cfa5bf-88a4-46ab-a899-36c1a500332f",
+          "timestamp": 1776603298,
+          "pos_x": 120.4098129272461,
+          "pos_y": 24.714981079101562,
+          "cause_of_death": "void",
+          "nivel_label": "Nivel 1"
+        },
+        {
+          "session_id": "c0cfa5bf-88a4-46ab-a899-36c1a500332f",
+          "timestamp": 1776603332,
+          "pos_x": 223.36000061035156,
+          "pos_y": 92.06299591064453,
+          "cause_of_death": "void",
+          "nivel_label": "Nivel 2"
+        },
+        {
+          "session_id": "27c6ca73-9d40-4f9e-bde3-c7223bbf6dc0",
+          "timestamp": 1776613632,
+          "pos_x": 21.302473068237305,
+          "pos_y": 2.572967529296875,
+          "cause_of_death": "void",
+          "nivel_label": "Nivel 1"
+        },
+        {
+          "session_id": "27c6ca73-9d40-4f9e-bde3-c7223bbf6dc0",
+          "timestamp": 1776613699,
+          "pos_x": 81.16472625732422,
+          "pos_y": 81.16472625732422,
+          "cause_of_death": "enemy_range",
+          "nivel_label": "Nivel 1"
+        },
+        {
+          "session_id": "27c6ca73-9d40-4f9e-bde3-c7223bbf6dc0",
+          "timestamp": 1776613759,
+          "pos_x": 223.36000061035156,
+          "pos_y": 92.06299591064453,
+          "cause_of_death": "void",
+          "nivel_label": "Nivel 2"
+        },
+        {
+          "session_id": "27c6ca73-9d40-4f9e-bde3-c7223bbf6dc0",
+          "timestamp": 1776613783,
+          "pos_x": 223.36000061035156,
+          "pos_y": 92.06299591064453,
+          "cause_of_death": "void",
+          "nivel_label": "Nivel 2"
         }
       ]
     }
   },
   "M4.2": {
     "name": "Tiempo promedio por tramo (segundos)",
-    "value": 26.29,
+    "value": 26.27,
     "detail": {
-      "tramos_analizados": 14,
-      "media_global_s": 26.29,
-      "mediana_global_s": 18.5,
+      "tramos_analizados": 30,
+      "media_global_s": 26.27,
+      "mediana_global_s": 20.0,
       "min_s": 2,
       "max_s": 67,
       "por_tramo": [
@@ -621,9 +1115,9 @@
           "level_id": 1.0,
           "pos_label": "(57.3, 15.7)",
           "tramo_label": "Nivel 1 · (57.3, 15.7)",
-          "n_visitas": 2,
-          "media_s": 46.5,
-          "mediana_s": 46.5,
+          "n_visitas": 4,
+          "media_s": 48.25,
+          "mediana_s": 50.0,
           "min_s": 40,
           "max_s": 53
         },
@@ -632,10 +1126,10 @@
           "level_id": 1.0,
           "pos_label": "(93.4, 45.9)",
           "tramo_label": "Nivel 1 · (93.4, 45.9)",
-          "n_visitas": 2,
-          "media_s": 46.0,
-          "mediana_s": 46.0,
-          "min_s": 33,
+          "n_visitas": 4,
+          "media_s": 40.0,
+          "mediana_s": 40.5,
+          "min_s": 20,
           "max_s": 59
         },
         {
@@ -643,9 +1137,9 @@
           "level_id": 1.0,
           "pos_label": "(21.3, 2.6)",
           "tramo_label": "Nivel 1 · (21.3, 2.6)",
-          "n_visitas": 2,
-          "media_s": 14.0,
-          "mediana_s": 14.0,
+          "n_visitas": 4,
+          "media_s": 13.75,
+          "mediana_s": 13.5,
           "min_s": 11,
           "max_s": 17
         },
@@ -654,9 +1148,9 @@
           "level_id": 1.0,
           "pos_label": "(120.4, 24.7)",
           "tramo_label": "Nivel 1 · (120.4, 24.7)",
-          "n_visitas": 2,
-          "media_s": 8.0,
-          "mediana_s": 8.0,
+          "n_visitas": 4,
+          "media_s": 8.25,
+          "mediana_s": 8.5,
           "min_s": 7,
           "max_s": 9
         },
@@ -665,9 +1159,9 @@
           "level_id": 1.0,
           "pos_label": "(-5.8, 0.6)",
           "tramo_label": "Nivel 1 · (-5.8, 0.6)",
-          "n_visitas": 2,
-          "media_s": 3.5,
-          "mediana_s": 3.5,
+          "n_visitas": 4,
+          "media_s": 3.75,
+          "mediana_s": 4.0,
           "min_s": 2,
           "max_s": 5
         },
@@ -676,10 +1170,10 @@
           "level_id": 2.0,
           "pos_label": "(290.6, 93.2)",
           "tramo_label": "Nivel 2 · (290.6, 93.2)",
-          "n_visitas": 2,
-          "media_s": 47.5,
-          "mediana_s": 47.5,
-          "min_s": 28,
+          "n_visitas": 5,
+          "media_s": 36.8,
+          "mediana_s": 28.0,
+          "min_s": 20,
           "max_s": 67
         },
         {
@@ -687,88 +1181,94 @@
           "level_id": 2.0,
           "pos_label": "(223.4, 92.1)",
           "tramo_label": "Nivel 2 · (223.4, 92.1)",
-          "n_visitas": 2,
-          "media_s": 18.5,
-          "mediana_s": 18.5,
+          "n_visitas": 5,
+          "media_s": 29.6,
+          "mediana_s": 23.0,
           "min_s": 18,
-          "max_s": 19
+          "max_s": 57
         }
       ]
     }
   },
   "M4.3": {
     "name": "Ratio de muertes por minuto (por tramo)",
-    "value": 7.107,
+    "value": 3.351,
     "detail": {
-      "total_muertes": 20,
-      "tramos_con_muerte": 5,
-      "ratio_global_muertes_min": 7.107,
+      "total_muertes": 26,
+      "tramos_con_muerte": 6,
+      "ratio_global_muertes_min": 3.351,
       "por_tramo": [
         {
           "tramo_id": "(-5.8, 0.6)",
           "muertes": 2,
-          "tiempo_total_s": 7,
-          "muertes_por_min": 17.143
+          "tiempo_total_s": 15,
+          "muertes_por_min": 8.0
+        },
+        {
+          "tramo_id": "(120.4, 24.7)",
+          "muertes": 1,
+          "tiempo_total_s": 33,
+          "muertes_por_min": 1.818
         },
         {
           "tramo_id": "(21.3, 2.6)",
-          "muertes": 2,
-          "tiempo_total_s": 28,
-          "muertes_por_min": 4.286
+          "muertes": 3,
+          "tiempo_total_s": 55,
+          "muertes_por_min": 3.273
         },
         {
           "tramo_id": "(223.4, 92.1)",
-          "muertes": 4,
-          "tiempo_total_s": 37,
-          "muertes_por_min": 6.486
+          "muertes": 7,
+          "tiempo_total_s": 148,
+          "muertes_por_min": 2.838
         },
         {
           "tramo_id": "(290.6, 93.2)",
           "muertes": 9,
-          "tiempo_total_s": 95,
-          "muertes_por_min": 5.684
+          "tiempo_total_s": 184,
+          "muertes_por_min": 2.935
         },
         {
           "tramo_id": "(57.3, 15.7)",
-          "muertes": 3,
-          "tiempo_total_s": 93,
-          "muertes_por_min": 1.935
+          "muertes": 4,
+          "tiempo_total_s": 193,
+          "muertes_por_min": 1.244
         }
       ]
     }
   },
   "M5.1": {
     "name": "Tasa de apertura de cofres secundarios",
-    "value": 0.75,
+    "value": 0.875,
     "detail": {
-      "total_aperturas": 9,
-      "sesiones_unicas_que_abrieron": 2,
+      "total_aperturas": 19,
+      "sesiones_unicas_que_abrieron": 4,
       "por_nivel": [
         {
           "level_id": 1.0,
-          "sesiones_que_abrieron": 2,
-          "sesiones_en_nivel": 2,
+          "sesiones_que_abrieron": 4,
+          "sesiones_en_nivel": 4,
           "tasa_apertura": 1.0
         },
         {
           "level_id": 2.0,
-          "sesiones_que_abrieron": 1,
-          "sesiones_en_nivel": 2,
-          "tasa_apertura": 0.5
+          "sesiones_que_abrieron": 3,
+          "sesiones_en_nivel": 4,
+          "tasa_apertura": 0.75
         }
       ],
       "por_tipo_cofre": [
         {
           "chest_id": "featheritem",
-          "aperturas_totales": 6
+          "aperturas_totales": 12
         },
         {
           "chest_id": "life",
-          "aperturas_totales": 1
+          "aperturas_totales": 3
         },
         {
           "chest_id": "sword",
-          "aperturas_totales": 2
+          "aperturas_totales": 4
         }
       ]
     }
@@ -776,41 +1276,41 @@
   "M7.1": {
     "name": "Porcentaje de uso por tipo de ataque",
     "value": {
-      "ground": 75.0,
-      "aerial": 25.0
+      "ground": 78.0,
+      "aerial": 22.0
     },
     "detail": {
-      "total_ataques": 32,
+      "total_ataques": 50,
       "conteo": {
-        "ground": 24,
-        "aerial": 8
+        "ground": 39,
+        "aerial": 11
       },
       "porcentaje": {
-        "ground": 75.0,
-        "aerial": 25.0
+        "ground": 78.0,
+        "aerial": 22.0
       }
     }
   },
   "M7.2": {
     "name": "Hit Rate (global y por tipo)",
-    "value": 0.375,
+    "value": 0.42,
     "detail": {
-      "total_ataques": 32,
-      "aciertos": 12,
-      "hit_rate_global": 0.375,
-      "hit_rate_pct": 37.5,
+      "total_ataques": 50,
+      "aciertos": 21,
+      "hit_rate_global": 0.42,
+      "hit_rate_pct": 42.0,
       "por_tipo": [
         {
           "attack_type": "aerial",
-          "intentos": 8,
-          "aciertos": 4,
-          "hit_rate": 0.5
+          "intentos": 11,
+          "aciertos": 6,
+          "hit_rate": 0.5455
         },
         {
           "attack_type": "ground",
-          "intentos": 24,
-          "aciertos": 8,
-          "hit_rate": 0.3333
+          "intentos": 39,
+          "aciertos": 15,
+          "hit_rate": 0.3846
         }
       ]
     }

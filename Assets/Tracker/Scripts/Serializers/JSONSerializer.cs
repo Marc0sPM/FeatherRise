@@ -1,24 +1,32 @@
 using System.Collections.Generic;
-using UnityEngine;
 using System.Text;
 
+/// <summary>
+/// Serializador a JSON. Produce un archivo con una lista de listas:
+///   [
+///     [ {evento1}, {evento2}, ... ],   ← primer flush
+///     [ {eventoN}, {eventoN+1}, ... ], ← segundo flush
+///     ...
+///   ]
+/// </summary>
 public class JSONSerializer : ISerializer
 {
     public string Serialize(List<TrackerEvent> events, bool isFirstBatch)
     {
         StringBuilder sb = new StringBuilder();
 
-        // Si no es el primer volcado, separamos el lote anterior de este con una coma
+        // Separador con el batch anterior. La coma solo va si NO es el primero.
         if (!isFirstBatch)
         {
             sb.AppendLine(",");
         }
 
-        sb.AppendLine("  ["); // Abre el array de este lote específico
+        sb.Append("  [");
+        sb.AppendLine();
 
         for (int i = 0; i < events.Count; i++)
         {
-            string jsonEvent = JsonUtility.ToJson(events[i]);
+            string jsonEvent = UnityEngine.JsonUtility.ToJson(events[i]);
             sb.Append("    ").Append(jsonEvent);
 
             if (i < events.Count - 1)
@@ -27,18 +35,10 @@ public class JSONSerializer : ISerializer
                 sb.AppendLine();
         }
 
-        sb.Append("  ]"); // Cierra el array de este lote
-
+        sb.Append("  ]");
         return sb.ToString();
     }
 
-    public string GetHeader()
-    {
-        return "[\n"; 
-    }
-
-    public string GetFooter()
-    {
-        return "\n]"; 
-    }
+    public string GetHeader() => "[\n";
+    public string GetFooter() => "\n]";
 }
