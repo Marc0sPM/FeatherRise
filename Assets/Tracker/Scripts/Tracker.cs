@@ -81,41 +81,36 @@ public class Tracker : MonoBehaviour
         {
             eventsToFlush.Add(e);
         }
-        string data = ""; 
-        try
-        {
-            // Serializamos y guardamos los datos
-            data = _serializer.Serialize(eventsToFlush, _isFirstFlush);
-            _persistence.Save(data);
-            _isFirstFlush = false; 
-        } 
-        catch (System.Exception ex)
-        {
-            Debug.LogError($"[TRACKER] Error al guardar datos: {ex.Message}");
-            ReturnEventsToQueue(eventsToFlush); 
-        }
 
         if (forceSynchronous) 
         {
-            // Si el juego se esta cerrando, no se pueden usar hilos secundarios.
-            // Windows los mata antes de acabar
-            try { _persistence.Save(data); }
-            catch { ReturnEventsToQueue(eventsToFlush); }
+            serializeAndSave(eventsToFlush);
         }
         else
         {
             // Lanzamos hilo secundario
             Task.Run(() =>
             {
-                try { _persistence.Save(data); }
-                catch (System.Exception ex)
-                {
-                    Debug.LogError($"[TRACKER] Error asíncrono al escribir en disco: {ex.Message}");
-                    ReturnEventsToQueue(eventsToFlush);
-                }
+                serializeAndSave(eventsToFlush); 
             });
         }
     }
+
+    private void serializeAndSave(List<TrackerEvent> eventsToFlush)
+    {
+        try
+        {
+            string data = _serializer.Serialize(eventsToFlush, _isFirstFlush);
+            _persistence.Save(data); 
+            if(_isFirstFlush) _isFirstFlush = false;
+        }
+        catch (System.Exception ex)
+        {
+            Debug.LogError($"[TRACKER] Error al guardar datos: {ex.Message}");
+            ReturnEventsToQueue(eventsToFlush);
+        }
+    }
+
     /// <summary>
     /// Devuelve a la cola los eventos de la lista
     /// </summary>
