@@ -93,6 +93,33 @@ Se ha desarrollado un sistema de telemetría modular para la recolección de eve
 
 **[Enlace Manual de uso del sistema de telemetría](../README_Instructions.md)**
 
+### 5.1. Partes opcionales
+
+#### **`Serialización y persistencia en hebra independiente`**
+A continuación se detalla cómo se ha integrado el uso de una hebra independiente para la persistencia. El script `Tracker.cs` sí utiliza multihilo, pero no de forma “pura” en todo momento. 
+El sistema de telemetría utiliza un enfoque mixto (síncrono + asíncrono) para gestionar el guardado de eventos sin afectar al rendimiento del juego.
+
+Modo asíncrono (multihilo): Por defecto, los datos se guardan en segundo plano usando `Task.Run`, lo que ejecuta la escritura en un hilo distinto al principal. Su objetivo es evitar bloqueos o caídas de rendimiento en el render del juego.
+
+Modo síncrono (hilo principal): En momentos críticos (como al pausar o cerrar la aplicación), el guardado se realiza en el hilo principal. Su objetivo es garantizar que no se pierdan datos antes de que el proceso termine.
+```pseudocode
+// Tracker.cs - Flush(forceSynchronous)
+
+if (forceSynchronous == true)
+{
+  // Modo síncrono (hilo principal)
+  // Se usa en cierre o pausa del juego
+  persistence.Save(data)
+}
+else
+{
+  // Modo asíncrono (multihilo)
+  // Se usa durante el gameplay normal
+  run_in_background_thread(() => {
+    persistence.Save(data)
+  })
+}
+```
 ---
 
 ## 6. Instrumentalización del Videojuego
