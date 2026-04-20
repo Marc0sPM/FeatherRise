@@ -1,0 +1,287 @@
+{
+  "telemetry": {
+    "8b969f93-10c5-4a0e-aa9c-8261e08f631f": {
+      "-OqcE-wdnnuZ0Prc7Tl4": [
+        {
+          "event_type": "Session_End",
+          "session_id": "8b969f93-10c5-4a0e-aa9c-8261e08f631f",
+          "timestamp": 1776644068
+        }
+      ]
+    },
+    "da5527d5-6bb4-4e00-95a5-7095db56bf85": {
+      "-OqcDMVXudSQ_YIR3q03": [
+        {
+          "event_type": "Level_Start",
+          "level_id": 1,
+          "session_id": "da5527d5-6bb4-4e00-95a5-7095db56bf85",
+          "timestamp": 1776643828
+        },
+        {
+          "event_type": "Checkpoint_Reached",
+          "pos_x": -0.699981689453125,
+          "pos_y": -0.20000457763671875,
+          "session_id": "da5527d5-6bb4-4e00-95a5-7095db56bf85",
+          "timestamp": 1776643828
+        },
+        {
+          "event_type": "Checkpoint_Reached",
+          "pos_x": -5.786724090576172,
+          "pos_y": 0.5762405395507812,
+          "session_id": "da5527d5-6bb4-4e00-95a5-7095db56bf85",
+          "timestamp": 1776643831
+        },
+        {
+          "chest_id": "featheritem",
+          "event_type": "Chest_Opened",
+          "level_id": 1,
+          "session_id": "da5527d5-6bb4-4e00-95a5-7095db56bf85",
+          "timestamp": 1776643874
+        },
+        {
+          "event_type": "Feather_Recall_Attempt",
+          "is_successful": true,
+          "session_id": "da5527d5-6bb4-4e00-95a5-7095db56bf85",
+          "timestamp": 1776643883
+        },
+        {
+          "event_type": "Feather_Recall_Attempt",
+          "is_successful": true,
+          "session_id": "da5527d5-6bb4-4e00-95a5-7095db56bf85",
+          "timestamp": 1776643888
+        },
+        {
+          "event_type": "Checkpoint_Reached",
+          "pos_x": 21.302473068237305,
+          "pos_y": 2.572967529296875,
+          "session_id": "da5527d5-6bb4-4e00-95a5-7095db56bf85",
+          "timestamp": 1776643892
+        }
+      ],
+      "-OqcDTacirT75w9dAbpn": [
+        {
+          "chest_id": "featheritem",
+          "event_type": "Chest_Opened",
+          "level_id": 1,
+          "session_id": "da5527d5-6bb4-4e00-95a5-7095db56bf85",
+          "timestamp": 1776643908
+        },
+        {
+          "event_type": "Feather_Recall_Attempt",
+          "is_successful": true,
+          "session_id": "da5527d5-6bb4-4e00-95a5-7095db56bf85",
+          "timestamp": 1776643915
+        },
+        {
+          "event_type": "Feather_Recall_Attempt",
+          "is_successful": true,
+          "session_id": "da5527d5-6bb4-4e00-95a5-7095db56bf85",
+          "timestamp": 1776643923
+        },
+        {
+          "event_type": "Feather_Recall_Attempt",
+          "is_successful": false,
+          "session_id": "da5527d5-6bb4-4e00-95a5-7095db56bf85",
+          "timestamp": 1776643925
+        },
+        {
+          "event_type": "Feather_Recall_Attempt",
+          "is_successful": true,
+          "session_id": "da5527d5-6bb4-4e00-95a5-7095db56bf85",
+          "timestamp": 1776643926
+        },
+        {
+          "chest_id": "sword",
+          "event_type": "Chest_Opened",
+          "level_id": 1,
+          "session_id": "da5527d5-6bb4-4e00-95a5-7095db56bf85",
+          "timestamp": 1776643926
+        }
+      ],
+      "-OqcD_vLWQyDou5lAIq8": [
+        {
+          "attack_type": "ground",
+          "enemy_hit": true,
+          "event_type": "Player_Attack",
+          "session_id": "da5527d5-6bb4-4e00-95a5-7095db56bf85",
+          "timestamp": 1776643929
+        },
+        {
+          "attack_type": "ground",
+          "enemy_hit": true,
+          "event_type": "Player_Attack",
+          "session_id": "da5527d5-6bb4-4e00-95a5-7095db56bf85",
+          "timestamp": 1776643930
+        },
+        {
+          "attack_type": "ground",
+          "enemy_hit": true,
+          "event_type": "Player_Attack",
+          "session_id": "da5527d5-6bb4-4e00-95a5-7095db56bf85",
+          "timestamp": 1776643930
+        },
+        {
+          "event_type": "Checkpoint_Reached",
+          "pos_x": 57.31513595581055,
+          "pos_y": 15.656108856201172,
+          "session_id": "da5527d5-6bb4-4e00-95a5-7095db56bf85",
+          "timestamp": 1776643933
+        },
+        {
+          "event_type": "Feather_Recall_Attempt",
+          "is_successful": true,
+          "session_id": "da5527d5-6bb4-4e00-95a5-7095db56bf85",
+          "timestamp": 1776643941
+        },
+        {
+          "attack_type": "ground",
+          "enemy_hit": false,
+          "event_type": "Player_Attack",
+          "session_id": "da5527d5-6bb4-4e00-95a5-7095db56bf85",
+          "timestamp": 1776643945
+        },
+        {
+          "attack_type": "ground",
+          "enemy_hit": true,
+          "event_type": "Player_Attack",
+          "session_id": "da5527d5-6bb4-4e00-95a5-7095db56bf85",
+          "timestamp": 1776643945
+        },
+        {
+          "attack_type": "ground",
+          "enemy_hit": true,
+          "event_type": "Player_Attack",
+          "session_id": "da5527d5-6bb4-4e00-95a5-7095db56bf85",
+          "timestamp": 1776643945
+        },
+        {
+          "attack_type": "ground",
+          "enemy_hit": true,
+          "event_type": "Player_Attack",
+          "session_id": "da5527d5-6bb4-4e00-95a5-7095db56bf85",
+          "timestamp": 1776643946
+        },
+        {
+          "attack_type": "ground",
+          "enemy_hit": false,
+          "event_type": "Player_Attack",
+          "session_id": "da5527d5-6bb4-4e00-95a5-7095db56bf85",
+          "timestamp": 1776643946
+        },
+        {
+          "chest_id": "featheritem",
+          "event_type": "Chest_Opened",
+          "level_id": 1,
+          "session_id": "da5527d5-6bb4-4e00-95a5-7095db56bf85",
+          "timestamp": 1776643947
+        },
+        {
+          "event_type": "Feather_Recall_Attempt",
+          "is_successful": true,
+          "session_id": "da5527d5-6bb4-4e00-95a5-7095db56bf85",
+          "timestamp": 1776643953
+        },
+        {
+          "event_type": "Checkpoint_Reached",
+          "pos_x": 93.42303466796875,
+          "pos_y": 45.87944793701172,
+          "session_id": "da5527d5-6bb4-4e00-95a5-7095db56bf85",
+          "timestamp": 1776643953
+        }
+      ],
+      "-OqcDhOv5bILe8ZSPBTf": [
+        {
+          "event_type": "Checkpoint_Reached",
+          "pos_x": 120.4098129272461,
+          "pos_y": 24.714981079101562,
+          "session_id": "da5527d5-6bb4-4e00-95a5-7095db56bf85",
+          "timestamp": 1776643961
+        },
+        {
+          "event_type": "Feather_Recall_Attempt",
+          "is_successful": true,
+          "session_id": "da5527d5-6bb4-4e00-95a5-7095db56bf85",
+          "timestamp": 1776643964
+        },
+        {
+          "attack_type": "ground",
+          "enemy_hit": false,
+          "event_type": "Player_Attack",
+          "session_id": "da5527d5-6bb4-4e00-95a5-7095db56bf85",
+          "timestamp": 1776643975
+        },
+        {
+          "event_type": "Level_End",
+          "level_id": 1,
+          "result": "completed",
+          "session_id": "da5527d5-6bb4-4e00-95a5-7095db56bf85",
+          "timestamp": 1776643977
+        },
+        {
+          "event_type": "Level_Start",
+          "level_id": 2,
+          "session_id": "da5527d5-6bb4-4e00-95a5-7095db56bf85",
+          "timestamp": 1776643977
+        },
+        {
+          "event_type": "Checkpoint_Reached",
+          "pos_x": 223.36000061035156,
+          "pos_y": 92.06299591064453,
+          "session_id": "da5527d5-6bb4-4e00-95a5-7095db56bf85",
+          "timestamp": 1776643977
+        }
+      ],
+      "-OqcDoiaRiZSLh1bTTRF": [
+        {
+          "event_type": "Checkpoint_Reached",
+          "pos_x": 290.5879821777344,
+          "pos_y": 93.17677307128906,
+          "session_id": "da5527d5-6bb4-4e00-95a5-7095db56bf85",
+          "timestamp": 1776643991
+        },
+        {
+          "event_type": "Feather_Recall_Attempt",
+          "is_successful": true,
+          "session_id": "da5527d5-6bb4-4e00-95a5-7095db56bf85",
+          "timestamp": 1776643992
+        },
+        {
+          "cause_of_death": "void",
+          "event_type": "Player_Death",
+          "pos_x": 290.5879821777344,
+          "pos_y": 93.17677307128906,
+          "session_id": "da5527d5-6bb4-4e00-95a5-7095db56bf85",
+          "timestamp": 1776643993
+        },
+        {
+          "event_type": "Feather_Recall_Attempt",
+          "is_successful": true,
+          "session_id": "da5527d5-6bb4-4e00-95a5-7095db56bf85",
+          "timestamp": 1776644005
+        },
+        {
+          "event_type": "Feather_Recall_Attempt",
+          "is_successful": true,
+          "session_id": "da5527d5-6bb4-4e00-95a5-7095db56bf85",
+          "timestamp": 1776644008
+        }
+      ],
+      "-OqcDw6yWfDq6ds_uDdI": [
+        {
+          "event_type": "Level_End",
+          "level_id": 2,
+          "result": "completed",
+          "session_id": "da5527d5-6bb4-4e00-95a5-7095db56bf85",
+          "timestamp": 1776644033
+        }
+      ],
+      "-OqcDzihhDap5Yth8_tB": [
+        {
+          "event_type": "Session_End",
+          "session_id": "da5527d5-6bb4-4e00-95a5-7095db56bf85",
+          "timestamp": 1776644063
+        }
+      ]
+    }
+  }
+}

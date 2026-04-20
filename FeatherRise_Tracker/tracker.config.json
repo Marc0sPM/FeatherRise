@@ -1,0 +1,19 @@
+{
+    "enabled": true,
+    "verboseLogging": false,
+
+    "serializer": "CSV",
+    "persistence": "LocalFile",
+
+    "localFileOutputMode": "NextToExe",
+    "customOutputDir": "",
+
+    "fileRotationMaxMb": 0.0,
+
+    "firebaseDatabaseUrl": "https://featherrise-telemetry-p3-default-rtdb.europe-west1.firebasedatabase.app/",
+
+    "autoFlushIntervalSeconds": 15.0,
+    "fileBufferSizeBytes": 4096,
+
+    "disabledEventTypes": []
+}
