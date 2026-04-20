@@ -143,6 +143,46 @@ O bien:
 También es posible configurar el tipo de serialización directamente desde el Editor de Unity.
 Esto permite cambiar el formato sin necesidad de editar manualmente el archivo de configuración.
 
+#### **`Envío de trazas a servidor web (Firebase)`**
+El sistema permite enviar los eventos de telemetría a un servidor web utilizando **Firebase Realtime Database** mediante su API REST.
+Para ello se han implementado dos componentes:
+
+### Serialización (`FirebaseSerializer`)
+Los eventos se convierten a formato **JSON** utilizando `JsonUtility`.  
+Cada envío se construye como un **array independiente de eventos**, ya que Firebase no requiere mantener una estructura acumulativa entre envíos.
+Ejemplo de salida:
+
+```json
+[
+    { "event": "event_1", ... },
+    { "event": "event_2", ... }
+]
+````
+
+---
+
+### Persistencia (`FirebasePersistence`)
+
+El envío de datos se realiza mediante peticiones HTTP (`POST`) a la URL de Firebase:
+
+```
+https://featherrise-telemetry-p3-default-rtdb.europe-west1.firebasedatabase.app/
+```
+
+Para poder ver los datos usar la misma URL con .json al final y activar la casilla de `dar formato al texto`
+```
+https://featherrise-telemetry-p3-default-rtdb.europe-west1.firebasedatabase.app/.json
+```
+
+Características principales:
+
+* Uso de `HttpClient` (thread-safe) para reutilizar conexiones.
+* Envío en formato JSON (`application/json`, UTF-8).
+* Ejecución desde un **hilo secundario** (integrado con el `Tracker`).
+* Control de errores: si la petición falla, se lanza una excepción para reencolar los eventos.
+
+---
+
 ## 6. Instrumentalización del Videojuego
 
 Se han extendido las clases base del juego para instanciar el `Tracker` y disparar los eventos.
