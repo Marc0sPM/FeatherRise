@@ -33,7 +33,7 @@ Repositorio de los datos brutos utilizados para el análisis.
 
 ---
 
-## 🚀 Reproducibilidad del Análisis
+## Reproducibilidad del Análisis
 
 Para volver a generar las gráficas y métricas presentadas en el informe, se adjunta el material necesario en la carpeta:
 **[Material de Análisis y Código](FeatherRise_Tracker/Analisis/analisis)**
