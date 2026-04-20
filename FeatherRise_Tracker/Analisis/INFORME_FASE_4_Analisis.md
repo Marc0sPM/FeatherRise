@@ -9,14 +9,14 @@
 
 ## 0. Resumen ejecutivo
 
-El análisis se ha ejecutado sobre **4 sesiones de juego** (`27c6ca73`, `ad4b271a`, `c0cfa5bf`, `ed5a11c2`) con un total de **81 intentos de recall de plumas**, **26 muertes**, **50 ataques** y **19 aperturas de cofres**. Los resultados confirman **3 de las 4 hipótesis** planteadas en la Fase 1 y refutan la cuarta (H5), con hallazgos adicionales sobre concentración espacial de muertes en el Nivel 2.
+El análisis se ha ejecutado sobre **6 sesiones de juego** (`8b969f93`,`3fccb79e`, `27c6ca73`, `ad4b271a`, `c0cfa5bf`, `ed5a11c2`) con un total de **110 intentos de recall de plumas, 35 muertes, 67 ataques y 28 aperturas de cofres.**. Los resultados confirman **3 de las 4 hipótesis** planteadas en la Fase 1 y refutan la cuarta (H5), con hallazgos adicionales sobre concentración espacial de muertes en el Nivel 2.
 
 | Hipótesis | Veredicto | Evidencia principal |
 |:--:|:--|:--|
-| H1 — Fricción del recall de plumas | ✅ **Confirmada con matices** | 28,4 % de intentos fallidos (23/81). Consistente entre sesiones (27-31 %). Sí se observa curva de aprendizaje en 3/4 sesiones. |
-| H4 — Cuellos de botella por dificultad | ✅ **Confirmada** | Muertes concentradas en 2 ubicaciones del Nivel 2 (16/26 = 61,5 %). Ratio 2,8-2,9 muertes/min en esas zonas. |
-| H5 — Cofres ignorados | ❌ **Refutada** | 100 % de sesiones abrieron cofres en Nivel 1 y 75 % en Nivel 2. Los cofres no se ignoran. |
-| H7 — Spam de ataque terrestre | ✅ **Confirmada** | 78 % ground vs 22 % aerial. Hit rate 38,5 % (ground) vs 54,5 % (aerial). |
+| H1 — Fricción del recall de plumas | ✅ **Confirmada con matices** | 22,73 % de intentos fallidos (25/110). Consistente entre sesiones (27-31 %). Sí se observa curva de aprendizaje en 3/4 sesiones. |
+| H4 — Cuellos de botella por dificultad | ✅ **Confirmada** | Muertes fuertemente concentradas en 2 ubicaciones del Nivel 2 (23/35 = 65,7 %). Ratio crítico de 4,0 muertes/min en la zona más letal.|
+| H5 — Cofres ignorados | ❌ **Refutada** | 100 % de sesiones abrieron cofres en Nivel 1 y 66,7 % en Nivel 2. Los cofres no se ignoran. |
+| H7 — Spam de ataque terrestre | ✅ **Confirmada** | 79,1 % ground vs 20,9 % aerial. Hit rate 43,4 % (ground) vs 64,3 % (aerial). |
 
 ---
 
@@ -27,12 +27,14 @@ Corpus analizado:
 | Sesión | Intentos recall | Fallos | Tasa fallo |
 |:--|--:|--:|--:|
 | `27c6ca73` | 16 | 5 | 31,3 % |
+| `3fccb79e` | 17 | 1 | 5,9 % |
 | `ad4b271a` | 18 | 5 | 27,8 % |
 | `c0cfa5bf` | 22 | 6 | 27,3 % |
+| `da5527d5` | 12 | 1 | 8,3 % |
 | `ed5a11c2` | 25 | 7 | 28,0 % |
-| **Total** | **81** | **23** | **28,4 %** |
+| **Total** | **110** | **25** | **22,7 %** |
 
-Las 4 sesiones recogen entre 16 y 25 intentos de recall cada una, con tasas de fallo sorprendentemente consistentes (rango 27-31 %). Esta homogeneidad inter-sesión refuerza la validez estadística de las conclusiones sobre H1 incluso con N=4: el efecto no depende de un jugador concreto.
+Las 6 sesiones recogen entre 12 y 25 intentos de recall cada una. A diferencia de la tanda anterior, observamos una mayor varianza en las tasas de fallo (rango 5,9 % - 31,3 %). Esto indica que la fricción inicial afecta fuertemente a ciertos jugadores, mientras que otros asimilan la mecánica casi de inmediato.
 
 Las 2 sesiones más largas (`c0cfa5bf` y `ed5a11c2`) llegan al Nivel 2, las otras 2 se quedan en el Nivel 1. Tenemos por primera vez datos suficientes para analizar la curva de dificultad entre niveles.
 
@@ -48,23 +50,25 @@ Las 2 sesiones más largas (`c0cfa5bf` y `ed5a11c2`) llegan al Nivel 2, las otra
 
 | Métrica | Valor |
 |:--|--:|
-| Intentos totales | 81 |
-| Intentos exitosos | 58 (71,6 %) |
-| Intentos fallidos | **23 (28,4 %)** |
+| Intentos totales | 110 |
+| Intentos exitosos | 85 (77,3 %)|
+| Intentos fallidos | **25 (22,7 %)** |
 
 **Análisis de aprendizaje (primer tercio vs último tercio de cada sesión):**
 
 | Sesión | Primer tercio | Último tercio | Δ | Lectura |
 |:--|--:|--:|--:|:--|
 | `27c6ca73` | 60,0 % | 20,0 % | **−40 pp** | Aprende muy rápido |
+| `3fccb79e` | 20,0 %| 0,0 %| −20 pp | Parte con pocos fallos y los elimina rápido |
 | `ad4b271a` | 0,0 % | 0,0 % | 0 pp | Parte sin fallos, tiene un pico en medio y vuelve a 0 |
 | `c0cfa5bf` | 28,6 % | 14,3 % | −14 pp | Aprende gradualmente |
+| `da5527d5` | 0,0 %| 0,0 %| 0 pp| Sin fallos relevantes en toda la sesión |
 | `ed5a11c2` | 37,5 % | 12,5 % | −25 pp | Aprende gradualmente |
 
-**Interpretación:** La hipótesis original se confirma pero con un matiz importante. La tasa global de fallo (28,4 %) es elevada, pero **3 de las 4 sesiones muestran curva de aprendizaje descendente** (entre −14 y −40 puntos porcentuales). La sesión `ad4b271a` es atípica porque empieza sin errores y tiene un pico en los intentos 10-12 antes de volver a 0 %, lo que sugiere que el jugador ya dominaba la mecánica al empezar y el pico central probablemente refleja una zona del juego donde el diseño induce al fallo (no una confusión de controles).
+**Interpretación:**La hipótesis original se confirma pero con un matiz importante. La tasa global de fallo (22,7 %) sigue siendo representativa, y 4 de las 6 sesiones muestran una curva de aprendizaje descendente (reducciones de entre 14 y 40 puntos porcentuales). Las sesiones ad4b271a y da5527d5 son atípicas porque apenas presentan errores iniciales, lo que sugiere que algunos jugadores dominan o intuyen la mecánica rápidamente, mientras la mayoría sufre una fricción notable. El pico central probablemente refleja una zona del juego donde el diseño induce al fallo (no una confusión de controles).
 
 **Implicación de diseño:**
-1. El 28,4 % de fallo global NO es atribuible a un problema motriz puro (pulsar `W` por error), porque entonces la tasa se mantendría plana. La reducción a lo largo de la sesión apunta a una **curva de onboarding empinada**: los jugadores NO entienden las condiciones del recall al principio (haber lanzado las 3 plumas) y lo van aprendiendo por ensayo y error.
+1. El 22,7 % % de fallo global NO es atribuible a un problema motriz puro (pulsar `W` por error), porque entonces la tasa se mantendría plana. La reducción a lo largo de la sesión apunta a una **curva de onboarding empinada**: los jugadores NO entienden las condiciones del recall al principio (haber lanzado las 3 plumas) y lo van aprendiendo por ensayo y error.
 2. Para la siguiente iteración conviene:
    - Un indicador visual persistente del estado del recall (disponible / no disponible).
    - Desdoblar el atributo `is_successful` del evento en un `failure_reason` enumerado (`already_recalling`, `no_feathers_thrown`, `other`) para distinguir los dos modos de fallo hipotetizados en la Fase 1.
@@ -81,15 +85,15 @@ Las 2 sesiones más largas (`c0cfa5bf` y `ed5a11c2`) llegan al Nivel 2, las otra
 
 | Dato | Valor |
 |:--|--:|
-| Total de muertes | **26** |
-| Por causa | void: 23 (88,5 %) · enemy_range: 2 (7,7 %) · enemy_mele: 1 (3,8 %) |
-| Por nivel | Nivel 1: 10 (38,5 %) · Nivel 2: 16 (61,5 %) |
+| Total de muertes | **35** |
+| Por causa | void: 32 (91,4 %) · enemy_range: 2 (5,7 %) · enemy_mele: 1 (2,9 %) |
+| Por nivel | Nivel 1: 12 (34,3 %) · Nivel 2: 23 (65,7 %) |
 
-**Hallazgo clave:** el Nivel 2 concentra más muertes que el Nivel 1 pese a que sólo 2 de las 4 sesiones llegan a él, y **las 16 muertes del Nivel 2 se producen en sólo 2 ubicaciones**:
-- `(223.4, 92.1)` — 7 muertes por void
-- `(290.6, 93.2)` — 9 muertes por void
+**Hallazgo clave:** el Nivel 2 concentra una cantidad desproporcionada de muertes (65,7 %), y **las 16 muertes del Nivel 2 se producen en sólo 2 ubicaciones**:
+- `(223.4, 92.1)` — 8 muertes por void
+- `(290.6, 93.2)` — 15 muertes por void
 
-En el Nivel 1 las 10 muertes están más distribuidas (7 ubicaciones distintas), lo que es esperable: el jugador explora el nivel entero y los fallos son más dispersos. En el Nivel 2, en cambio, el patrón es claramente de "trampa" geométrica: dos precipicios concretos matan al 100 % de los jugadores que pasan cerca, repetidamente.
+En el Nivel 1 las 12 muertes están más distribuidas, lo que es esperable en una fase de exploración. En el Nivel 2, en cambio, el patrón de "trampa" geométrica es alarmante: el precipicio en la coordenada X: 290 acumula casi la mitad de todas las muertes del juego.
 
 #### M4.2 — Tiempo entre checkpoints
 
@@ -97,20 +101,20 @@ En el Nivel 1 las 10 muertes están más distribuidas (7 ubicaciones distintas),
 
 | Estadístico | Valor |
 |:--|--:|
-| Tramos analizados | 30 |
-| Media global | 26,3 s |
-| Mediana global | 20,0 s |
+| Tramos analizados | 44 |
+| Media global | 24,43 s |
+| Mediana global | 19,5 s |
 | Mínimo / Máximo | 2 s / 67 s |
 
 **Tramos más lentos** (ordenados por tiempo medio):
 
 | Nivel | Tramo destino | Visitas | Tiempo medio | Mediana | Rango |
 |:--|:--|--:|--:|--:|:--|
-| Nivel 1 | `(57.3, 15.7)` | 4 | **48,2 s** | 50,0 | 40-53 |
-| Nivel 1 | `(93.4, 45.9)` | 4 | **40,0 s** | 40,5 | 20-59 |
-| Nivel 2 | `(290.6, 93.2)` | 5 | **36,8 s** | 28,0 | 20-67 |
-| Nivel 2 | `(223.4, 92.1)` | 5 | 29,6 s | 23,0 | 18-57 |
-| Nivel 1 | `(21.3, 2.6)` | 4 | 13,8 s | 13,5 | 11-17 |
+| Nivel 1 | `(57.3, 15.7)` | 6 | **45,3 s** | 44,0 | 38-53 |
+| Nivel 1 | `(93.4, 45.9)` | 6 | **33,5 s** | 27,0 | 20-59 |
+| Nivel 2 | `(290.6, 93.2)` | 7 | **32,1 s** | 27,0 | 14-67 |
+| Nivel 2 | `(223.4, 92.1)` | 7 | 25,4 s | 19,0 | 14-57 |
+| Nivel 1 | `(21.3, 2.6)` | 6 | 21,3 s | 13,5 | 11-61 |
 
 Los tramos `(57.3, 15.7)` y `(93.4, 45.9)` del Nivel 1 son los más lentos en media, pero tienen cero muertes asociadas — es decir, son zonas donde el jugador **tarda porque hay contenido** (puzle, combate, exploración), no porque esté fallando. En contraste, los tramos del Nivel 2 con 29-37 s de media **sí acumulan muertes**.
 
@@ -120,18 +124,20 @@ Los tramos `(57.3, 15.7)` y `(93.4, 45.9)` del Nivel 1 son los más lentos en me
 
 | Tramo | Muertes | Tiempo total (s) | Muertes/min | Lectura |
 |:--|--:|--:|--:|:--|
-| `(-5.8, 0.6)` | 2 | 15 | **8,00** | Muy alto, pero tramo corto → puede ser anecdótico |
-| `(21.3, 2.6)` | 3 | 55 | 3,27 | Moderado |
-| `(290.6, 93.2)` | 9 | 184 | **2,94** | **Cuello de botella confirmado** |
-| `(223.4, 92.1)` | 7 | 148 | **2,84** | **Cuello de botella confirmado** |
-| `(120.4, 24.7)` | 1 | 33 | 1,82 | Bajo |
-| `(57.3, 15.7)` | 4 | 193 | 1,24 | Bajo (mucho tiempo, pocas muertes = atasco cognitivo) |
+| `(-5.8, 0.6)` | 2 | 20 | **6,00** | Muy alto, pero tramo corto → puede ser anecdótico |
+| `(290.6, 93.2)` | 15 | 225 | **4,00** | **Cuello de botella confirmado** |
+| `(223.4, 92.1)` | 8 | 178 | **2,70** | **Cuello de botella confirmado** |
+| `(21.3, 2.6)` | 3 | 128 | 1,41 | Moderado |
+| `(120.4, 24.7)` | 1 | 51 | 1,18 | Bajo |
+| `(57.3, 15.7)` | 4 | 272 | 1,10 | Bajo (mucho tiempo, pocas muertes = atasco cognitivo) |
+| `(93.4, 45.9)` | 1 | 201 | 0,30 | Bajo (mucho tiempo, pocas muertes = atasco cognitivo) |
 
 **Interpretación combinada (M4.1 + M4.2 + M4.3):**
 
-- Los **dos tramos del Nivel 2** son los cuellos de botella REALES: acumulan 16 de las 26 muertes totales, con ratios de ~2,9 muertes/min y los jugadores pasan allí más de 2 minutos en acumulado. Ambas muertes son 100 % por `void`, no por enemigos → problema de **plataformeo o feedback visual**, no de combate.
-- El tramo `(57.3, 15.7)` del Nivel 1 tiene un patrón distinto: **mucho tiempo (48 s de media) pero pocas muertes (4 muertes en 193 s → 1,24/min)**. Esto cuadra con la descripción del "puzle del nivel 2.2" que aparecía en la Fase 1 como atasco cognitivo: los jugadores no mueren, pero se paralizan intentando entender qué hacer.
-- El tramo `(-5.8, 0.6)` tiene un ratio de 8 muertes/min pero sólo 15 s de tiempo total invertido, así que con N=2 muertes no es concluyente (podría ser simplemente un inicio fallido de una sola sesión).
+- Los **dos tramos del Nivel 2** son los cuellos de botella REALES: acumulan 23 de las 35 muertes totales. La zona (290.6, 93.2) es especialmente crítica, matando a los jugadores a un ritmo de 4 veces por minuto. Ambas muertes son 100 % por void, confirmando un problema de **plataformeo severo o falta de feedback visual**.
+- El tramo `(57.3, 15.7)` del Nivel 1 tiene un patrón distinto: **mucho tiempo acumulado (272 s en total) y baja letalidad (1,10/min)**. Esto cuadra con la descripción del "puzle del nivel 2.2" que aparecía en la Fase 1 como atasco cognitivo: los jugadores no mueren, pero se paralizan intentando entender qué hacer.
+- El tramo `(-5.8, 0.6)` tiene un ratio de 6 muertes/min pero sólo 20 s de tiempo total invertido, así que con N=2 muertes no es concluyente (podría ser simplemente un inicio fallido de una sola sesión).
+- Zonas como `(93.4, 45.9)` son ejemplos de diseño sano: requieren tiempo para superarse pero apenas castigan con la muerte.
 
 **La hipótesis H4 se confirma**, y además se identifican tres tipos distintos de fricción:
 1. **Fricción motriz / plataforming** (Nivel 2, coordenadas `(223.4, 92.1)` y `(290.6, 93.2)`): muertes frecuentes por caída al vacío. Solución: mejorar el feedback de los bordes, añadir plataformas intermedias, o revisar la altura de salto.
@@ -150,22 +156,22 @@ Los tramos `(57.3, 15.7)` y `(93.4, 45.9)` del Nivel 1 son los más lentos en me
 
 | Nivel | Sesiones que jugaron | Sesiones que abrieron ≥1 cofre | Tasa |
 |:--:|--:|--:|--:|
-| Nivel 1 | 4 | 4 | **100 %** |
-| Nivel 2 | 4 | 3 | **75 %** |
+| Nivel 1 | 6 | 6 | **100 %** |
+| Nivel 2 | 6 | 4 | **66,7 %** |
 
 **Desglose por contenido del cofre:**
 
 | `chest_id` | Aperturas | % |
 |:--|--:|--:|
-| `featheritem` | 12 | 63,2 % |
-| `sword` | 4 | 21,1 % |
-| `life` | 3 | 15,8 % |
+| `featheritem` | 18 | 64,3 % |
+| `sword` | 6 | 21,4 % |
+| `life` | 4 | 14,3 % |
 
-**Interpretación:** La hipótesis H5 queda **refutada con los datos disponibles**. El 100 % de las sesiones abrieron al menos un cofre en el Nivel 1 y el 75 % lo hicieron en el Nivel 2. No hay evidencia de que los jugadores ignoren sistemáticamente los cofres.
+**Interpretación:** La hipótesis H5 queda **refutada con los datos disponibles**. El 100 % de las sesiones abrieron al menos un cofre en el Nivel 1 y el 66,7 % lo hicieron en el Nivel 2. No hay evidencia de que los jugadores ignoren sistemáticamente los cofres.
 
 El desglose por contenido es revelador:
-- Los cofres `featheritem` (12 aperturas) son los más abiertos porque son necesarios mecánicamente: sin plumas no puedes progresar, así que el jugador los busca activamente.
-- Los cofres `sword` (4) y `life` (3) se abren menos en términos absolutos. Sin embargo, esto NO indica que se ignoren: probablemente es que hay **menos cofres de ese tipo en el juego** que de `featheritem`. Para confirmarlo haría falta conocer el total de cofres de cada tipo colocados en los niveles y calcular una tasa de apertura real `aperturas / cofres_presentes`.
+- Los cofres `featheritem` (18 aperturas) son los más abiertos porque son necesarios mecánicamente: sin plumas no puedes progresar, así que el jugador los busca activamente.
+- Los cofres `sword` (6) y `life` (4) se abren menos en términos absolutos. Sin embargo, esto NO indica que se ignoren: probablemente es que hay **menos cofres de ese tipo en el juego** que de `featheritem`. Para confirmarlo haría falta conocer el total de cofres de cada tipo colocados en los niveles y calcular una tasa de apertura real `aperturas / cofres_presentes`.
 
 **Limitación de la métrica actual:** el evento `Chest_Opened` registra solo las aperturas, no las "no aperturas" (cofres avistados pero ignorados). Para una validación más fina de H5 en el siguiente ciclo convendría añadir:
 - Un evento `Chest_Skipped` cuando el jugador pasa cerca de un cofre sin abrirlo (detectable con un trigger de proximidad).
@@ -183,30 +189,30 @@ El desglose por contenido es revelador:
 
 | Tipo | Conteo | % |
 |:--|--:|--:|
-| Ground | 39 | **78,0 %** |
-| Aerial | 11 | 22,0 % |
-| **Total** | **50** | 100 % |
+| Ground | 53 | **79,1 %** |
+| Aerial | 14 | 20,9 % |
+| **Total** | **67** | 100 % |
 
 #### M7.2 — Hit Rate por tipo
 
 | Tipo | Intentos | Aciertos | Hit Rate |
 |:--|--:|--:|--:|
-| Aerial | 11 | 6 | **54,5 %** |
-| Ground | 39 | 15 | **38,5 %** |
-| **Global** | **50** | **21** | **42,0 %** |
+| Aerial | 14 | 9 | **64,3 %** |
+| Ground | 53 | 23 | **43,4 %** |
+| **Global** | **67** | **32** | **47,8 %** |
 
 **Interpretación:** La hipótesis se confirma pero con matices comparado con los datos iniciales.
 
-Por cada ataque aéreo se hacen **3,5 ataques en suelo** (ratio 39:11). El desbalance es evidente pero menos extremo del que sugería la tanda anterior (15:1 con datos antiguos). Probablemente el ratio real se estabiliza en torno a 4:1 cuando aumenta la muestra.
+Por cada ataque aéreo se hacen **3,8 ataques en suelo** (ratio 53:14). Probablemente el ratio real se estabiliza en torno a 4:1 cuando aumenta la muestra.
 
 Lo más interesante es el **hit rate por tipo**:
-- **Aerial: 54,5 %** (6/11). Cuando se usa, acierta más de la mitad de las veces.
-- **Ground: 38,5 %** (15/39). Acierta menos de 2 de cada 5 intentos.
+- **Aerial: 64,3 %** (9/14). Cuando el jugador decide saltar y atacar, es muy preciso.
+- **Ground: 43,4 %** (23/53). Acierta menos de la mitad de las veces.
 
-Esto invierte ligeramente la lectura del informe anterior: **el ataque aéreo es más eficiente** que el terrestre en términos de aciertos, PERO los jugadores lo usan 3,5 veces menos. La hipótesis original hablaba de "spam de ground" y "subutilización de aerial", y los datos lo confirman plenamente:
+Esto invierte ligeramente la lectura del informe anterior: **el ataque aéreo es más eficiente** que el terrestre en términos de aciertos, PERO los jugadores lo usan 3,8 veces menos. La hipótesis original hablaba de "spam de ground" y "subutilización de aerial", y los datos lo confirman plenamente:
 
-- Si los jugadores usaran aerial en la misma proporción que ground, el hit rate global subiría de 42 % a un estimado de ~52 %.
-- El bajo hit rate de ground (38,5 %) sugiere exactamente el patrón de *button mash* descrito en la hipótesis: cuando el jugador entra en modo "spam", la mayoría de los golpes se lanzan sin un enemigo delante.
+- Si los jugadores usaran aerial en la misma proporción que ground, el hit rate global subiría de 43,4 % a un estimado de ~52 %.
+- El bajo hit rate de ground (43,4 %) sugiere exactamente el patrón de *button mash* descrito en la hipótesis: cuando el jugador entra en modo "spam", la mayoría de los golpes se lanzan sin un enemigo delante.
 
 **Implicación de diseño:** Los datos justifican una intervención en el tutorial o en los encuentros tempranos que empuje al jugador a descubrir el ataque aéreo y su mejor retorno por golpe. Posibles acciones:
 - Encuentros donde ciertos enemigos sean inalcanzables desde suelo, obligando a usar aerial.
@@ -219,11 +225,11 @@ Esto invierte ligeramente la lectura del informe anterior: **el ataque aéreo es
 
 1. **H1, H4 y H7 se confirman.** H5 se refuta con la métrica actual; puede requerir instrumentación adicional (evento `Chest_Skipped` o conteo estático de cofres) para ser validada en el siguiente ciclo.
 
-2. **El Nivel 2 concentra el 61,5 % de las muertes** en sólo 2 ubicaciones, con un patrón claro de "trampa" por void. Es el cuello de botella más significativo del juego actualmente instrumentado y el candidato más obvio a rediseño.
+2. **El Nivel 2 concentra el 65,7 % de las muertes** en sólo 2 ubicaciones, con un patrón claro de "trampa" por void. Es el cuello de botella más significativo del juego actualmente instrumentado y el candidato más obvio a rediseño.
 
-3. **La curva de aprendizaje del recall es real** (3 de 4 sesiones muestran descenso claro en la tasa de fallo entre primer y último tercio), lo que apunta a un problema de onboarding más que de fricción motriz permanente. Una intervención de UI (indicador visual del estado del recall) debería reducir significativamente la tasa global actual del 28,4 %.
+3. **La curva de aprendizaje del recall es real** (4 de las 6 sesiones muestran descenso claro en la tasa de fallo entre primer y último tercio), lo que apunta a un problema de onboarding más que de fricción motriz permanente. Una intervención de UI (indicador visual del estado del recall) debería reducir significativamente la tasa global actual.
 
-4. **El combate está desequilibrado** hacia el ataque terrestre pese a que el aéreo es más eficiente (54,5 % vs 38,5 % hit rate). Es una oportunidad clara de intervención de diseño: empujar al jugador hacia el aerial debería mejorar tanto la sensación de dominio mecánico como el ritmo del combate.
+4. **El combate está desequilibrado** hacia el ataque terrestre pese a que el aéreo es más eficiente (64,3 % vs 43,4 % hit rate). Es una oportunidad clara de intervención de diseño: empujar al jugador hacia el aerial debería mejorar tanto la sensación de dominio mecánico como el ritmo del combate.
 
 5. **Próximos pasos analíticos recomendados** (ordenados por valor):
    - (a) Desdoblar `Feather_Recall_Attempt.is_successful` en un enum de razones de fallo.
