@@ -84,3 +84,28 @@ Todos los cálculos están implementados en `analyze_telemetry.py` (script repro
 | **M5.1** | `Chest_Opened` + `Level_Start` (o `level_id` de checkpoints) | Se cuentan los `session_id` únicos que generaron `Chest_Opened` en cada nivel y se divide entre el total de `session_id` que jugaron ese nivel. Se desglosa además por `chest_id` para distinguir cofres principales (p. ej. `featheritem` del tutorial) de los secundarios. |
 | **M7.1** | `Player_Attack` | Se contabiliza el total de ataques. Se calcula el porcentaje de eventos con `attack_type == "ground"` y `attack_type == "aerial"`. |
 | **M7.2** | `Player_Attack` | `aciertos / total = nº eventos con enemy_hit == true / total de eventos`. Se calcula el *hit rate* global y desglosado por `attack_type` para detectar si el problema de precisión es transversal o específico de uno de los dos tipos. |
+
+## 5. Implementación del Sistema de Telemetría
+
+Se ha desarrollado un sistema de telemetría modular para la recolección de eventos.
+
+**[Enlace al repositorio del Sistema de Telemetría](../../Assets/Tracker/)**
+
+**[Enlace Manual de uso del sistema de telemetría](../README_Instructions.md)**
+
+---
+
+## 6. Instrumentalización del Videojuego
+
+Se han extendido las clases base del juego para instanciar el `Tracker` y disparar los eventos.
+
+**[Enlace al repositorio del Juego Instrumentalizado](../../)**
+
+**[Enlace de descarga a la Build Ejecutable](../)**
+
+### 6.1. Clases Modificadas
+* **`GameManager.cs`**: Modificado para inicializar el Tracker y gestionar los eventos de inicio/fin de nivel y checkpoints.
+* **`PlayerCombat.cs`**: Instrumentado para capturar los eventos de ataque y distinguir entre `ground` y `aerial`.
+* **`InputComponent.cs`**: Registra los intentos de recogida de plumas (`Feather_Recall_Attempt`).
+* **`HealthComponent.cs` / `VoidComponent.cs`**: Capturan la muerte del jugador, enviando posición y causa.
+* **`ChestComponent.cs`**: Dispara el evento al abrir con éxito un cofre.
