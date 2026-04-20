@@ -1,27 +1,78 @@
-# FASE 2: Arquitectura del Sistema de Telemetría (Tracker)
+# Arquitectura del Sistema de Telemetría (Tracker)
 
-Este documento detalla el diseño técnico y la arquitectura del sistema de telemetría (Tracker) que se integrará en Feather Rise. El sistema ha sido diseñado como un módulo independiente y desacoplado, garantizando que su funcionamiento no afecte al rendimiento del juego y que, en caso de fallo, el flujo de la partida continúe con normalidad.
+Este documento detalla el diseño técnico y la arquitectura final del sistema de telemetría (Tracker) integrado en *Feather Rise*. El sistema ha sido diseñado como un módulo robusto, independiente, altamente configurable y preparado para no afectar al rendimiento del videojuego mediante el uso de concurrencia y operaciones asíncronas.
+
+---
 
 ## 1. Visión General de la Arquitectura
 
-La arquitectura del Tracker sigue un patrón modular basado en tres pilares fundamentales:
+El Tracker sigue un patrón modular basado en la inyección de dependencias y la separación de responsabilidades. Se compone de los siguientes bloques principales:
 
-* Gestión de Eventos: Generación y almacenamiento temporal en una cola concurrente.
+1. **Configuración Dinámica (`TrackerConfig` y `TrackerInitializer`)**: Permite alterar el comportamiento del sistema (rutas, formatos, habilitar/deshabilitar eventos) sin necesidad de recompilar el juego.
+2. **Núcleo Central (`Tracker.cs`)**: Gestiona la ingesta de eventos mediante una cola concurrente (`ConcurrentQueue`) y el volcado periódico (*flush*) en hilos secundarios.
+3. **Jerarquía de Eventos**: Clases de datos estructuradas que heredan de una base común para automatizar la captura de metadatos.
+4. **Serialización y Persistencia (Interfaces)**: Capas abstractas que dictan cómo se formatean y dónde se guardan los datos, permitiendo intercambiar módulos (ej. JSON vs CSV, Local vs Nube) sin modificar el núcleo.
 
-* Serialización: Transformación de los objetos en memoria a un formato de datos estructurado.
+---
 
-* Persistencia: Guardado físico de los datos serializados.
+## 2. Inicialización y Configuración Dinámica
 
-Para garantizar la extensibilidad futura (tal y como se exige en los requisitos), las capas de serialización y persistencia se comunicarán a través de Interfaces, permitiendo cambiar el formato (ej. de JSON a XML) o el destino (ej. de Local a un Servidor en la nube) sin modificar el núcleo del Tracker.
+Para facilitar el *playtesting*, el sistema se inicializa evaluando un archivo de configuración en formato JSON (`tracker.config.json`). Si este archivo existe junto al ejecutable, sobrescribe los valores del Inspector.
 
-## 2. Jerarquía y Estructura de Eventos
+Esto permite modificar la salida de datos sin tocar el código:
+```csharp
+// Fragmento de TrackerConfig.cs
+public class TrackerConfig
+{
+    public bool enabled = true;
+    public string serializer = "JSON";       // "JSON" o "CSV"
+    public string persistence = "LocalFile"; // "LocalFile" o "Firebase"
+    public float fileRotationMaxMb = 0f;
+    public List<string> disabledEventTypes = new List<string>(); // Lista negra de eventos
+}
+```
+El `TrackerInitializer` lee esta configuración, instancia los serializadores y persistencias correspondientes, y hace la inyección de dependencias en el Tracker.
 
-Todos los eventos del sistema heredarán de una clase base común para garantizar la consistencia en los datos obligatorios.
+---
 
-### 2.1. Clase Base (TrackerEvent)
+## 3. Módulo Central (`Tracker.cs`)
 
-Atributos fijos que el Tracker asigna automáticamente a todos los eventos en el momento de su creación.
-``` c#
+Centraliza el flujo de datos protegiendo el *framerate* del juego. 
+
+### 3.1. Ingesta No Bloqueante
+Cuando el juego llama a `TrackEvent(e)`, el núcleo evalúa primero si ese evento está en la lista negra (`disabledEventTypes`) con complejidad O(1). Si es válido, se inyecta el `timestamp` y se introduce en una `ConcurrentQueue`, garantizando la seguridad entre hilos (*thread-safe*).
+
+### 3.2. Flush Asíncrono y Síncrono
+El volcado de datos (*flush*) extrae los eventos de la cola y los manda a guardar. Se puede ejecutar de dos formas:
+* **Asíncrono (Auto-Flush):** Una corutina lo ejecuta cada X segundos usando un hilo del sistema (`Task.Run`), evitando bloquear el renderizado.
+* **Síncrono (Preventivo):** Se fuerza en el hilo principal durante eventos críticos del SO (`OnApplicationQuit`, `OnApplicationPause`) para evitar pérdida de datos si el juego se cierra de golpe.
+
+```csharp
+// Fragmento de Tracker.cs - Lógica principal de volcado
+public void Flush(bool forceSynchronous = false)
+{
+    // [...] Extracción de la cola a la lista 'batch'
+    string data = _serializer.Serialize(batch, _isFirstFlush);
+    
+    if (forceSynchronous) {
+        _persistence.Save(data); // Escribe en el hilo principal
+    } else {
+        Task.Run(() => {
+            _persistence.Save(data); // Escribe en un hilo secundario
+        });
+    }
+}
+```
+
+---
+
+## 4. Jerarquía y Estructura de Eventos
+
+Todos los datos se estructuran bajo un modelo de herencia.
+
+### 4.1. Clase Base (`TrackerEvent.cs`)
+Define el esqueleto obligatorio. Captura automáticamente el nombre de la clase hija mediante reflexión para el campo `event_type`.
+```csharp
 [System.Serializable]
 public abstract class TrackerEvent
 {
@@ -31,173 +82,83 @@ public abstract class TrackerEvent
 
     public TrackerEvent()
     {
-        // El tracker asigará el timestamp y session_id al encolar
         this.event_type = this.GetType().Name; 
     }
 }
-
 ```
-### 2.2. Eventos de Sistema (Obligatorios)
 
-Eventos requeridos por el diseño general de la práctica para estructurar el flujo de datos:
+---
 
-* **`Session_Start`** : Marca el inicio de la ejecución del juego.
+## 5. Capa de Serialización (`ISerializer`)
 
-* **`Session_End`** : Marca el cierre del juego o de la sesión.
+Transforma los objetos de C# en cadenas de texto formateadas. Diseñado mediante interfaz (`Serialize`, `GetHeader`, `GetFooter`) para permitir múltiples salidas.
 
-* **`Level_Start`** : Lanzado al cargar una escena de nivel. Atributo: level_id.
+### 5.1. `JSONSerializer.cs`
+Genera un archivo JSON válido en formato de "lista de listas". Cada *flush* inyecta un nuevo array de eventos.
+```csharp
+// Fragmento JSONSerializer.cs
+if (!isFirstBatch) sb.AppendLine(","); // Separa los batches
+sb.Append("  [");
+// [...] bucle JsonUtility.ToJson(events[i])
+sb.Append("  ]");
+```
 
-* **`Level_End `**: Lanzado al terminar un nivel. Atributos: level_id, result (Enum: "Victory", "Defeat", "Quit").
+### 5.2. `CSVSerializer.cs`
+Genera un formato híbrido muy eficiente para análisis de datos. Crea columnas fijas para los metadatos y empaca los datos específicos del evento en un payload JSON, usando reflexión para ignorar los campos padre.
+```csharp
+// Fragmento CSVSerializer.cs
+    string baseCols = $"{e.timestamp},{e.session_id},{e.event_type},";
 
-### 2.3. Eventos Personalizados (Definidos en Fase 1)
+    // Sacamos solo los campos ESPECÍFICOS del evento (no los de la clase base)
+    string specificJson = SerializeSpecificFields(e);
 
-Eventos específicos instrumentalizados en el código de Feather Rise. Se implementan heredando de TrackerEvent:
-``` c#
-[System.Serializable]
-public class Feather_Recall_Attempt : TrackerEvent
+    // Escapar comillas dobles duplicándolas (regla CSV estándar)
+    string escaped = specificJson.Replace("\"", "\"\"");
+
+    sb.Append(baseCols).Append('"').Append(escaped).Append('"').AppendLine();
+```
+
+### 5.3. `FirebaseSerializer.cs`
+Adaptado para la API REST de Firebase Realtime Database. Genera un array plano de objetos JSON sin cabeceras ni separadores entre *batches*.
+
+---
+
+## 6. Capa de Persistencia (`IPersistence`)
+
+Encargada del I/O (Input/Output) físico o de red. Recibe el texto ya serializado y lo escribe en su destino.
+
+### 6.1. `LocalFilePersistence.cs`
+Módulo robusto de guardado en disco local. En lugar de abrir y cerrar el archivo en cada frame, **mantiene un `FileStream` abierto** durante toda la partida, mejorando el rendimiento masivamente.
+* Usa `Flush(flushToDisk: true)` para forzar al sistema operativo a escribir los datos inmediatamente, mitigando pérdidas por *crashes*.
+* Soporta rotación de archivos por tamaño.
+* Usa `FileShare.Read` para permitir lectura simultánea por scripts de análisis.
+
+```csharp
+// Fragmento LocalFilePersistence.cs - Guardado ultra-rápido y seguro
+public void Save(string data)
 {
-    public bool is_successful;
+    if (_rotationMaxBytes > 0 && _stream.Length >= _rotationMaxBytes)
+        RotateToNewPart(); // Rotación automática si el archivo es muy grande
+
+    _writer.Write(data);
+    _writer.Flush();
+    _stream.Flush(flushToDisk: true); // Forzado seguro a disco
+}
+```
+
+### 6.2. `FirebasePersistence.cs`
+Envía los datos a la nube utilizando llamadas REST. Reutiliza una única instancia estática de `HttpClient` (thread-safe) para no agotar los *sockets* del sistema. Como el Tracker lo invoca dentro de un `Task.Run`, puede esperar la respuesta HTTP de forma síncrona (`.Result`) sin congelar el videojuego.
+
+```csharp
+// Fragmento FirebasePersistence.cs
+public void Save(string data)
+{
+    var content = new StringContent(data, Encoding.UTF8, "application/json");
     
-    public Feather_Recall_Attempt(bool is_successful)
-    {
-        this.is_successful = is_successful;
-    }
-}
+    // Al estar en un hilo secundario, .Result no bloquea a Unity
+    HttpResponseMessage response = _httpClient.PostAsync(_databaseUrl, content).Result;
 
-[System.Serializable]
-public class Player_Death : TrackerEvent
-{
-    public float pos_x;
-    public float pos_y;
-    public string cause_of_death;
-    public string level_id;
-
-    public Player_Death(float x, float y, string cause, string level)
-    {
-        this.pos_x = x;
-        this.pos_y = y;
-        this.cause_of_death = cause;
-        this.level_id = level;
-    }
-}
-
-// ... Resto de eventos: Chest_Opened, Player_Attack, Checkpoint_Reached
-```
-
-## 3. Módulo Central (Tracker Core)
-
-El núcleo del Tracker se implementará como un Singleton persistente (MonoBehaviour con DontDestroyOnLoad en Unity o clase estática) para ser accesible desde cualquier script.
-
-Flujo de trabajo:
-
-* **Track**: El juego invoca al método TrackEvent(TrackerEvent e). El evento se encola inmediatamente en una estructura de datos (ej. una lista o cola tipo FIFO) en memoria RAM. No se procesa en el acto para evitar caídas de frames.
-
-* **Flush** (Vaciado): De forma periódica (ej. cada X segundos, al terminar un nivel, o al cerrar el juego), se llama al método Flush(). Este método extrae los eventos de la cola en lotes, los pasa al Serializador y posteriormente al módulo de Persistencia.
-``` c#
-public class Tracker 
-{
-    private static Tracker _instance;
-    public static Tracker Instance { get { /* Singleton logic */ return _instance; } }
-
-    private Queue<TrackerEvent> eventQueue = new Queue<TrackerEvent>();
-    private string currentSessionId;
-    
-    private ISerializer serializer;
-    private IPersistence persistence;
-
-    public void Init(ISerializer ser, IPersistence per) 
-    {
-        this.serializer = ser;
-        this.persistence = per;
-        this.currentSessionId = System.Guid.NewGuid().ToString();
-        // Disparar evento de inicio de sesión
-        TrackEvent(new Session_Start()); 
-    }
-
-    public void TrackEvent(TrackerEvent e)
-    {
-        // Asignar datos automáticos
-        e.timestamp = System.DateTimeOffset.UtcNow.ToUnixTimeSeconds();
-        e.session_id = currentSessionId;
-        
-        // Encolar rápidamente sin bloquear
-        eventQueue.Enqueue(e);
-    }
-
-    public void Flush()
-    {
-        if (eventQueue.Count == 0) return;
-
-        // Pasar la cola a una lista para procesar
-        List<TrackerEvent> eventsToFlush = new List<TrackerEvent>();
-        while(eventQueue.Count > 0) {
-            eventsToFlush.Add(eventQueue.Dequeue());
-        }
-
-        // Serializar y guardar (protegido contra fallos)
-        try {
-            string data = serializer.Serialize(eventsToFlush);
-            persistence.Save(data);
-        } catch (System.Exception ex) {
-            UnityEngine.Debug.LogError("Tracker Error: " + ex.Message);
-            // Opcional: Devolver eventos a la cola si falla el guardado
-        }
-    }
-}
-```
-
-## 4. Sistema de Serialización
-
-El módulo encargado de traducir los objetos a texto plano. Se basará en la interfaz ISerializer.
-
-```c#
-public interface ISerializer 
-{
-    string Serialize(List<TrackerEvent> events);
-}
-```
-
-Implementación Actual (JsonSerializer):
-Siguiendo los requisitos de la práctica, se implementará un serializador que convierta las listas de eventos a formato JSON (usando utilidades como JsonUtility de Unity o Newtonsoft.Json). Esto permitirá un análisis directo y automatizado con scripts de Python en la Fase 4.
-
-## 5. Sistema de Persistencia
-
-El módulo encargado de dar salida a los datos serializados, basado en la interfaz IPersistence.
-``` c#
-public interface IPersistence 
-{
-    void Save(string serializedData);
-    void Close();
-}
-```
-
-* **Implementación Actual** (LocalFilePersistence):
-Tal y como requiere el enunciado, los datos se volcarán en el disco duro local del equipo.
-
-* **Estrategia de archivos**: Se creará un archivo distinto por cada sesión de juego. El nombre del archivo incluirá el session_id y el timestamp inicial (ej. telemetry_session_5f8a_20260411.json).
-
-* **Seguridad** (Fail-safe): Toda operación de entrada/salida (I/O) al disco estará encapsulada en bloques try-catch para garantizar que un error de permisos o de disco lleno no bloquee ni crashee el videojuego principal.
-
-## 6. Instrumentalización (Integración con el Juego)
-
-Para instrumentalizar Feather Rise, se modificarán las clases clave (ej. PlayerController, HealthSystem, ChestInteractable) insertando llamadas asíncronas o de bajo coste al Tracker.
-
-Ejemplo de uso previsto en el código del juego:
-```c#
-// Ejemplo en el componente HealthSystem.cs
-public class HealthSystem : MonoBehaviour
-{
-    void Die() 
-    {
-        // Lógica del juego... (animaciones, recarga de escena, etc.)
-        
-        // Llamada de instrumentalización al Tracker
-        Tracker.Instance.TrackEvent(new Player_Death(
-            transform.position.x, 
-            transform.position.y, 
-            "Spikes", 
-            "2.2"
-        ));
-    }
+    if (!response.IsSuccessStatusCode)
+        throw new System.Exception($"Error de red: {response.StatusCode}");
 }
 ```
