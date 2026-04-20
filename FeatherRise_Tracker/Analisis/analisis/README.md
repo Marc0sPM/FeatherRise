@@ -70,4 +70,4 @@ Los eventos de jugabilidad de alta frecuencia (`Player_Attack`, `Feather_Recall_
 
 ## Conclusiones
 
-Ver `INFORME_FASE_4_Analisis.md` para el informe de resultados con conclusiones por hipótesis.
+Ver `Analisis_Telemetria.md` para el informe de resultados con conclusiones por hipótesis.

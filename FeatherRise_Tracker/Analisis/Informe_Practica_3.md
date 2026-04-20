@@ -1,4 +1,4 @@
-# FASE 1 — Diseño de la Evaluación Analítica
+# INFORME DE LA PRACTICA 3 - Feather Rise
 
 Este documento define la estrategia de telemetría implementada para *Feather Rise*. El objetivo es recopilar datos cuantitativos para validar o refutar de forma estadística las fricciones de diseño (brechas M, D y A) detectadas previamente durante el playtesting cualitativo.
 
@@ -102,7 +102,7 @@ El sistema de telemetría utiliza un enfoque mixto (síncrono + asíncrono) para
 Modo asíncrono (multihilo): Por defecto, los datos se guardan en segundo plano usando `Task.Run`, lo que ejecuta la escritura en un hilo distinto al principal. Su objetivo es evitar bloqueos o caídas de rendimiento en el render del juego.
 
 Modo síncrono (hilo principal): En momentos críticos (como al pausar o cerrar la aplicación), el guardado se realiza en el hilo principal. Su objetivo es garantizar que no se pierdan datos antes de que el proceso termine.
-```pseudocode
+```c#
 // Tracker.cs - Flush(forceSynchronous)
 
 if (forceSynchronous == true)
@@ -115,7 +115,7 @@ else
 {
   // Modo asíncrono (multihilo)
   // Se usa durante el gameplay normal
-  run_in_background_thread(() => {
+  Task.Run(() => {
     persistence.Save(data)
   })
 }
@@ -134,11 +134,10 @@ Se puede definir desde el archivo de configuración `tracker.config.json`, modif
 }
 ```
 O bien:
-```
+```json
 {
   "serializer": "CSV"
 }
----
 ```
 También es posible configurar el tipo de serialización directamente desde el Editor de Unity.
 Esto permite cambiar el formato sin necesidad de editar manualmente el archivo de configuración.
@@ -165,14 +164,13 @@ Ejemplo de salida:
 
 El envío de datos se realiza mediante peticiones HTTP (`POST`) a la URL de Firebase:
 
-```
 https://featherrise-telemetry-p3-default-rtdb.europe-west1.firebasedatabase.app/
-```
+
 
 Para poder ver los datos usar la misma URL con .json al final y activar la casilla de `dar formato al texto`
-```
+
 https://featherrise-telemetry-p3-default-rtdb.europe-west1.firebasedatabase.app/.json
-```
+
 
 Características principales:
 
@@ -180,6 +178,112 @@ Características principales:
 * Envío en formato JSON (`application/json`, UTF-8).
 * Ejecución desde un **hilo secundario** (integrado con el `Tracker`).
 * Control de errores: si la petición falla, se lanza una excepción para reencolar los eventos.
+
+---
+
+#### **`Envío de eventos con tiempo de muestreo configurable`**
+El intervalo con el que el `Tracker` vuelca la cola de eventos a disco o al servidor es **totalmente configurable**. Permite ajustar el equilibrio entre rendimiento (menos flushes = menos I/O) y robustez ante caídas (más flushes = menos pérdida potencial en caso de *crash* del proceso).
+
+La corutina `AutoFlushCoroutine` del `Tracker` lee el intervalo definido en la configuración y espera ese tiempo entre cada volcado automático. El valor por defecto es de 30 segundos.
+
+La configuración se realiza igualmente de dos formas:
+
+### Configuración mediante archivo
+
+Modificando el campo `autoFlushIntervalSeconds` del archivo `tracker.config.json`:
+
+```json
+{
+  "autoFlushIntervalSeconds": 30.0
+}
+```
+
+### Configuración desde el Editor de Unity
+
+El valor también se expone como un campo editable en el Inspector del `TrackerInitializer`, permitiendo ajustarlo de forma visual sin necesidad de reiniciar el archivo de configuración.
+
+```c#
+// Tracker.cs - AutoFlushCoroutine()
+private IEnumerator AutoFlushCoroutine()
+{
+  WaitForSeconds wait = new WaitForSeconds(_config.autoFlushIntervalSeconds);
+  while (_autoFlushRunning)
+  {
+    yield return wait;
+    if (_autoFlushRunning) Flush(false);
+  }
+}
+```
+
+#### **`Desactivación selectiva de tipos de eventos`**
+El sistema permite **desactivar el seguimiento de determinados tipos de eventos** sin necesidad de recompilar el juego ni modificar el código de instrumentalización. Esto resulta especialmente útil cuando se desea aislar el análisis en una mecánica concreta, reducir el volumen de trazas en *playtests* largos o depurar el comportamiento de un evento sin ruido del resto.
+
+Internamente, el `Tracker` mantiene un `HashSet<string>` con los nombres de los tipos de evento deshabilitados y consulta este conjunto en la llamada a `TrackEvent()`. Si el tipo coincide, el evento se descarta silenciosamente antes de encolarse, por lo que no consume memoria ni genera I/O.
+
+### Configuración mediante archivo
+
+Se añaden al campo `disabledEventTypes` del `tracker.config.json` los nombres de las clases de los eventos que se desean ignorar:
+
+```json
+{
+  "disabledEventTypes": ["Player_Attack", "Feather_Recall_Attempt"]
+}
+```
+
+En el ejemplo anterior, el `Tracker` continuará registrando el resto de eventos con normalidad pero ignorará todos los ataques y los intentos de recogida de plumas.
+
+```c#
+// Tracker.cs - TrackEvent(e)
+public void TrackEvent(TrackerEvent e)
+{
+  if (!IsReady || e == null) return;
+
+  string evType = e.GetType().Name;
+  if (_disabledEventTypes.Contains(evType))
+  {
+    // Descartado por filtro. No se encola.
+    return;
+  }
+
+  e.timestamp = System.DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+  e.session_id = _currentSessionId;
+  _eventQueue.Enqueue(e);
+}
+```
+
+#### **`Configuración del sistema de telemetría por datos`**
+El sistema de telemetría puede configurarse íntegramente **por datos**, sin necesidad de recompilar el juego. Esto es especialmente relevante para las *builds* distribuidas a *playtesters*, donde el Inspector de Unity ya no es accesible.
+
+### Archivo de configuración `tracker.config.json`
+
+Al arrancar, la clase `TrackerConfig` busca un archivo `tracker.config.json` en dos ubicaciones, por orden de prioridad:
+
+1. Junto al ejecutable del juego (o en la raíz del proyecto si se está en el Editor).
+2. En la ruta `Application.persistentDataPath` (`%APPDATA%/LocalLow/...` en Windows).
+
+Si encuentra alguno de los dos, carga la configuración desde ahí. Si no encuentra ninguno, utiliza como *fallback* los valores definidos en el Inspector del `TrackerInitializer`. El archivo expone todos los parámetros relevantes del sistema de telemetría:
+
+```json
+{
+  "enabled": true,
+  "verboseLogging": false,
+  "serializer": "JSON",
+  "persistence": "LocalFile",
+  "localFileOutputMode": "NextToExe",
+  "customOutputDir": "",
+  "fileRotationMaxMb": 0.0,
+  "firebaseDatabaseUrl": "",
+  "autoFlushIntervalSeconds": 30.0,
+  "fileBufferSizeBytes": 4096,
+  "disabledEventTypes": []
+}
+```
+
+### Configuración desde el Editor de Unity
+
+El `TrackerInitializer` expone todos los parámetros anteriores mediante atributos `[SerializeField]` y `[Header]`, organizados por bloques (serialización, persistencia, rendimiento, filtrado de eventos). Esto permite configurar el sistema de telemetría de forma visual durante el desarrollo, sin tocar ningún archivo de texto.
+
+Además, el componente dispone de una opción de menú contextual (`Generate config file next to exe`) que vuelca los valores actuales del Inspector al archivo `tracker.config.json` junto al ejecutable. Resulta útil para generar una plantilla lista para distribuir con la *build*, que el *playtester* puede editar libremente para cambiar la configuración sin recompilar.
 
 ---
 
@@ -197,13 +301,13 @@ A continuación se detalla cómo se ha integrado el sistema de telemetría (inst
 #### **`GameManager.cs`** 
 Actúa como el núcleo principal para rastrear el flujo de la partida, los puntos de control y las muertes por combate. Se ha modificado en tres métodos distintos:
   * Evento `Level_Start` y `Checkpoint_Reached` inicial: En el método `Start()`, se registra el inicio del nivel capturando el ID de la escena actual, y se lanza el primer checkpoint en la posición inicial del jugador.
-```pseudocode
+```c#
   int levelId = SceneManager.GetActiveScene().buildIndex;
   Tracker.Instance.TrackEvent(new Level_Start(levelId)); 
   Tracker.Instance.TrackEvent(new Checkpoint_Reached(_respawnPoint.x, _respawnPoint.y));
 ```
 * Evento `Checkpoint_Reached` en progreso: En el método `Checkpoint()`, cada vez que el jugador activa un punto de control, se guardan sus coordenadas.
-```pseudocode
+```c#
   public void Checkpoint(Vector2 respawnP)
   {
     _respawnPoint = respawnP;
@@ -211,7 +315,7 @@ Actúa como el núcleo principal para rastrear el flujo de la partida, los punto
   }
 ```
 * Evento `Player_Death` (Combate): En el método `LoseSouls()`, cuando las almas llegan a 0, se evalúa qué tipo de enemigo asestó el golpe final (`SpinComponent` para melee o `ProyectileComponent` para rango) y se envía el evento de muerte correspondiente.
-```pseudocode
+```c#
   if(_souls <= 0)
   {
     if ((bool)enemy.GetComponent<SpinComponent>())
@@ -230,7 +334,7 @@ Actúa como el núcleo principal para rastrear el flujo de la partida, los punto
 #### **`InputComponent.cs`**
 Se ha instrumentalizado la detección de la recogida de plumas para validar la fricción del control (Métrica M1.1).
 * Evento `Feather_Recall_Attempt`: En el método `Update()`, cuando el jugador pulsa la tecla "Feather Return", se evalúa si el jugador ya está llamando a las plumas o si aún no ha gastado todas (`GameManager.Instance.FeatherCant <= 0`). Se envía el evento con el flag booleano de éxito/fracaso.
-```pseudocode
+```c#
   if (Input.GetButtonDown("Feather Return"))
   {
     if(_isRecalling)
@@ -251,7 +355,7 @@ Se ha instrumentalizado la detección de la recogida de plumas para validar la f
 #### **`PlayerCombat.cs`**
 Encargado de monitorizar el estilo de combate del jugador para evaluar si se abusa del combate terrestre frente al aéreo (Métricas M7.1 y M7.2).
 * Evento `Player_Attack`: Dentro del método `Attack()`, se ha implementado el rastreo bifurcado. Si el jugador está tocando el suelo, se envía un ataque tipo `Ground`; si está en el aire, tipo `Aerial`. Además, se calcula dinámicamente si el ataque impactó a algún enemigo (`_hitEnemies.Count() > 0`).
-```pseudocode
+```c#
   // PlayerCombat.cs - Attack() (Fragmento Ground)
   Collider2D[] _hitEnemies = Physics2D.OverlapCapsuleAll(_attackPoint.position, _attackSize, _direction, _angleAttack, _enemylayer | _rangeLayer);
   Tracker.Instance.TrackEvent(new Player_Attack(AttackType.Ground, _hitEnemies.Count() > 0));            
@@ -264,7 +368,7 @@ Encargado de monitorizar el estilo de combate del jugador para evaluar si se abu
 #### **`ChestComponent.cs`**
 Instrumentalizado para analizar la tasa de exploración y recolección secundaria (Métrica M5.1).
 * Evento `Chest_Opened`: Dentro del método `Update()`, cuando el jugador interactúa con éxito con un cofre, se extrae el nombre del objeto instanciado (pasándolo a minúsculas para unificar) y se registra su apertura junto con el nivel actual.
-```pseudocode
+```c#
   // ChestComponent.cs - Update()
   if (Input.GetButtonDown("Interact"))
   {
@@ -278,7 +382,7 @@ Instrumentalizado para analizar la tasa de exploración y recolección secundari
 #### **`VoidComponent.cs`**
 Responsable de capturar las caídas al vacío, elemento clave para la detección de problemas de plataformeo en el diseño de niveles (Métrica M4.1 y M4.3).
 * Evento `Player_Death` (Void): En `OnTriggerEnter2D`, si el objeto que colisiona es el jugador, se registra su muerte clasificando la causa como "void" y guardando su posición exacta al caer.
-```pseudocode
+```c#
   // VoidComponent.cs - OnTriggerEnter2D()
   if ((bool)collision.gameObject.GetComponent<InputComponent>())
   {
@@ -290,7 +394,7 @@ Responsable de capturar las caídas al vacío, elemento clave para la detección
 #### **`DoorComponent.cs`**
 Gestiona la transición fluida y natural entre niveles, asumiendo una victoria en la escena actual.
 * Evento `Level_End` (Completed): En el método `CambiarNivel()`, justo antes de cargar la siguiente escena, se registra que el nivel actual ha finalizado con un resultado de finalización exitosa.
-```pseudocode
+```c#
   // DoorComponent.cs - CambiarNivel()
   public void CambiarNivel(int _index)
   {
@@ -304,7 +408,7 @@ Gestiona la transición fluida y natural entre niveles, asumiendo una victoria e
 #### **`UIManager.cs`**
 Capta los eventos de salida manual del juego (abandono).
 * Evento `Level_End` (Quit): En el método `Quit()`, si el jugador decide salir del juego desde el menú de pausa hacia el menú principal, se registra que el nivel terminó por abandono (`Quit`).
-```pseudocode
+```c#
   // UIManager.cs - Quit()
   public void Quit()
   {
