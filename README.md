@@ -28,7 +28,7 @@ Informe detallado tras procesar los datos recogidos en las sesiones de juego.
 
 ### 3. Datos y Trazas
 Repositorio de los datos brutos utilizados para el análisis.
-* **[Carpeta de Archivos de Datos/Trazas](FeatherRise_Tracker\Analisis\analisis\output)**
+* **[Carpeta de Archivos de Datos/Trazas](FeatherRise_Tracker/Analisis/analisis/output)**
     * Incluye archivos `.json` / `.csv` generados por el sistema para garantizar la transparencia del análisis.
 
 ---
@@ -36,8 +36,8 @@ Repositorio de los datos brutos utilizados para el análisis.
 ## 🚀 Reproducibilidad del Análisis
 
 Para volver a generar las gráficas y métricas presentadas en el informe, se adjunta el material necesario en la carpeta:
-**[Material de Análisis y Código](FeatherRise_Tracker\Analisis\analisis)**
-Será necesario leer el [README.md](FeatherRise_Tracker\Analisis\analisis\README.md) donde indican las instrucciones de forma más detallada, garantizado la reproducibilidad de la práctica, el README indica todo lo que es necesario para poder volver a generar las métricas: entorno de ejecución, versiones de lenguajes y librerías usadas y cómo instalarlas, dónde han de guardarse las trazas y cómo se ha de ejecutar el código entregado.
+**[Material de Análisis y Código](FeatherRise_Tracker/Analisis/analisis)**
+Será necesario leer el [README.md](FeatherRise_Tracker/Analisis/analisis/README.md) donde indican las instrucciones de forma más detallada, garantizado la reproducibilidad de la práctica, el README indica todo lo que es necesario para poder volver a generar las métricas: entorno de ejecución, versiones de lenguajes y librerías usadas y cómo instalarlas, dónde han de guardarse las trazas y cómo se ha de ejecutar el código entregado.
 
 ---
 © 2025-2026 — Desarrollo de Videojuegos
