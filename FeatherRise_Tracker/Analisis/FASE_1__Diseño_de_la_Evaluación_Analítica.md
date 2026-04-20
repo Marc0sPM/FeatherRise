@@ -120,7 +120,28 @@ else
   })
 }
 ```
+#### **`Implementación de otro método de serialización`**
+El sistema de telemetría permite exportar los eventos en **dos formatos distintos: `CSV` y `JSON`**. Esto hace posible adaptar la salida de datos según las necesidades del análisis posterior, la depuración o la integración con otras herramientas.
+La elección del formato de serialización se puede realizar de dos formas:
+
+### Configuración mediante archivo
+
+Se puede definir desde el archivo de configuración `tracker.config.json`, modificando el valor del campo `serializer`.
+
+```json
+{
+  "serializer": "JSON"
+}
+```
+O bien:
+```
+{
+  "serializer": "CSV"
+}
 ---
+```
+También es posible configurar el tipo de serialización directamente desde el Editor de Unity.
+Esto permite cambiar el formato sin necesidad de editar manualmente el archivo de configuración.
 
 ## 6. Instrumentalización del Videojuego
 
