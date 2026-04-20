@@ -188,13 +188,11 @@ public class GameManager : MonoBehaviour
             {
                 if ((bool)enemy.GetComponent<SpinComponent>())
                 {
-                    int levelId = SceneManager.GetActiveScene().buildIndex;
-                    Tracker.Instance.TrackEvent(new Player_Death(_player.transform.position.x, _player.transform.position.x, "enemy_mele"));
+                    Tracker.Instance.TrackEvent(new Player_Death(_player.transform.position.x, _player.transform.position.y, "enemy_mele"));
                 }
                 else if ((bool)enemy.GetComponent<ProyectileComponent>())
                 {
-                    int levelId = SceneManager.GetActiveScene().buildIndex;
-                    Tracker.Instance.TrackEvent(new Player_Death(_player.transform.position.x, _player.transform.position.x, "enemy_range"));
+                    Tracker.Instance.TrackEvent(new Player_Death(_player.transform.position.x, _player.transform.position.y, "enemy_range"));
                 }
             }
             
