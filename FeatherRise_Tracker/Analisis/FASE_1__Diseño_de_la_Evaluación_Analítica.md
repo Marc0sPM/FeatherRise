@@ -104,8 +104,124 @@ Se han extendido las clases base del juego para instanciar el `Tracker` y dispar
 **[Enlace de descarga a la Build Ejecutable](../)**
 
 ### 6.1. Clases Modificadas
-* **`GameManager.cs`**: Modificado para inicializar el Tracker y gestionar los eventos de inicio/fin de nivel y checkpoints.
-* **`PlayerCombat.cs`**: Instrumentado para capturar los eventos de ataque y distinguir entre `ground` y `aerial`.
-* **`InputComponent.cs`**: Registra los intentos de recogida de plumas (`Feather_Recall_Attempt`).
-* **`HealthComponent.cs` / `VoidComponent.cs`**: Capturan la muerte del jugador, enviando posición y causa.
-* **`ChestComponent.cs`**: Dispara el evento al abrir con éxito un cofre.
+A continuación se detalla cómo se ha integrado el sistema de telemetría (instrumentalización) dentro del código base del videojuego. Se han añadido llamadas al Singleton Tracker.Instance en los puntos clave de la lógica para capturar los eventos diseñados.
+
+#### **`GameManager.cs`** 
+Actúa como el núcleo principal para rastrear el flujo de la partida, los puntos de control y las muertes por combate. Se ha modificado en tres métodos distintos:
+  * Evento `Level_Start` y `Checkpoint_Reached` inicial: En el método `Start()`, se registra el inicio del nivel capturando el ID de la escena actual, y se lanza el primer checkpoint en la posición inicial del jugador.
+```pseudocode
+  int levelId = SceneManager.GetActiveScene().buildIndex;
+  Tracker.Instance.TrackEvent(new Level_Start(levelId)); 
+  Tracker.Instance.TrackEvent(new Checkpoint_Reached(_respawnPoint.x, _respawnPoint.y));
+```
+* Evento `Checkpoint_Reached` en progreso: En el método `Checkpoint()`, cada vez que el jugador activa un punto de control, se guardan sus coordenadas.
+```pseudocode
+  public void Checkpoint(Vector2 respawnP)
+  {
+    _respawnPoint = respawnP;
+    Tracker.Instance.TrackEvent(new Checkpoint_Reached(_respawnPoint.x, _respawnPoint.y));
+  }
+```
+* Evento `Player_Death` (Combate): En el método `LoseSouls()`, cuando las almas llegan a 0, se evalúa qué tipo de enemigo asestó el golpe final (`SpinComponent` para melee o `ProyectileComponent` para rango) y se envía el evento de muerte correspondiente.
+```pseudocode
+  if(_souls <= 0)
+  {
+    if ((bool)enemy.GetComponent<SpinComponent>())
+    {
+        int levelId = SceneManager.GetActiveScene().buildIndex;
+        Tracker.Instance.TrackEvent(new Player_Death(_player.transform.position.x, _player.transform.position.y, "enemy_mele")); // Nota: Corregido el pase del eje Y
+    }
+    else if ((bool)enemy.GetComponent<ProyectileComponent>())
+    {
+        int levelId = SceneManager.GetActiveScene().buildIndex;
+        Tracker.Instance.TrackEvent(new Player_Death(_player.transform.position.x, _player.transform.position.y, "enemy_range"));
+    }
+  }
+```
+
+#### **`InputComponent.cs`**
+Se ha instrumentalizado la detección de la recogida de plumas para validar la fricción del control (Métrica M1.1).
+* Evento `Feather_Recall_Attempt`: En el método `Update()`, cuando el jugador pulsa la tecla "Feather Return", se evalúa si el jugador ya está llamando a las plumas o si aún no ha gastado todas (`GameManager.Instance.FeatherCant <= 0`). Se envía el evento con el flag booleano de éxito/fracaso.
+```pseudocode
+  if (Input.GetButtonDown("Feather Return"))
+  {
+    if(_isRecalling)
+    {
+        Tracker.Instance.TrackEvent(new Feather_Recall_Attempt(false));
+        return; 
+    }
+    bool isSuccessful = GameManager.Instance.FeatherCant <= 0;
+    Tracker.Instance.TrackEvent(new Feather_Recall_Attempt(isSuccessful));
+
+    if(isSuccessful)
+    {
+        _isRecalling = true; 
+    }
+  }
+```
+
+#### **`PlayerCombat.cs`**
+Encargado de monitorizar el estilo de combate del jugador para evaluar si se abusa del combate terrestre frente al aéreo (Métricas M7.1 y M7.2).
+* Evento `Player_Attack`: Dentro del método `Attack()`, se ha implementado el rastreo bifurcado. Si el jugador está tocando el suelo, se envía un ataque tipo `Ground`; si está en el aire, tipo `Aerial`. Además, se calcula dinámicamente si el ataque impactó a algún enemigo (`_hitEnemies.Count() > 0`).
+```pseudocode
+  // PlayerCombat.cs - Attack() (Fragmento Ground)
+  Collider2D[] _hitEnemies = Physics2D.OverlapCapsuleAll(_attackPoint.position, _attackSize, _direction, _angleAttack, _enemylayer | _rangeLayer);
+  Tracker.Instance.TrackEvent(new Player_Attack(AttackType.Ground, _hitEnemies.Count() > 0));            
+
+  // PlayerCombat.cs - Attack() (Fragmento Aerial)
+  Collider2D[] _hitEnemisOnAir = Physics2D.OverlapCircleAll(_attackPoint.position, _radius, _enemylayer | _rangeLayer);
+  Tracker.Instance.TrackEvent(new Player_Attack(AttackType.Aerial, _hitEnemisOnAir.Count() > 0));
+```
+
+#### **`ChestComponent.cs`**
+Instrumentalizado para analizar la tasa de exploración y recolección secundaria (Métrica M5.1).
+* Evento `Chest_Opened`: Dentro del método `Update()`, cuando el jugador interactúa con éxito con un cofre, se extrae el nombre del objeto instanciado (pasándolo a minúsculas para unificar) y se registra su apertura junto con el nivel actual.
+```pseudocode
+  // ChestComponent.cs - Update()
+  if (Input.GetButtonDown("Interact"))
+  {
+    // [Código previo de instanciación y animación]
+    string item_name = _content.name.ToLower();
+    int levelId = SceneManager.GetActiveScene().buildIndex;
+    Tracker.Instance.TrackEvent(new Chest_Opened(item_name,  levelId));
+  }
+```
+
+#### **`VoidComponent.cs`**
+Responsable de capturar las caídas al vacío, elemento clave para la detección de problemas de plataformeo en el diseño de niveles (Métrica M4.1 y M4.3).
+* Evento `Player_Death` (Void): En `OnTriggerEnter2D`, si el objeto que colisiona es el jugador, se registra su muerte clasificando la causa como "void" y guardando su posición exacta al caer.
+```pseudocode
+  // VoidComponent.cs - OnTriggerEnter2D()
+  if ((bool)collision.gameObject.GetComponent<InputComponent>())
+  {
+    // [Código de Respawn previo]
+    Tracker.Instance.TrackEvent(new Player_Death(player.transform.position.x, player.transform.position.y, "void"));
+  }
+```
+
+#### **`DoorComponent.cs`**
+Gestiona la transición fluida y natural entre niveles, asumiendo una victoria en la escena actual.
+* Evento `Level_End` (Completed): En el método `CambiarNivel()`, justo antes de cargar la siguiente escena, se registra que el nivel actual ha finalizado con un resultado de finalización exitosa.
+```pseudocode
+  // DoorComponent.cs - CambiarNivel()
+  public void CambiarNivel(int _index)
+  {
+    int levelId = SceneManager.GetActiveScene().buildIndex;
+    Tracker.Instance.TrackEvent(new Level_End(levelId, LevelResult.Completed)); 
+
+    SceneManager.LoadScene(_index);
+    GameManager.Instance.Featherslvl2();
+  }
+```
+#### **`UIManager.cs`**
+Capta los eventos de salida manual del juego (abandono).
+* Evento `Level_End` (Quit): En el método `Quit()`, si el jugador decide salir del juego desde el menú de pausa hacia el menú principal, se registra que el nivel terminó por abandono (`Quit`).
+```pseudocode
+  // UIManager.cs - Quit()
+  public void Quit()
+  {
+    int levelId = SceneManager.GetActiveScene().buildIndex;
+    Tracker.Instance.TrackEvent(new Level_End(levelId, LevelResult.Quit));
+    SceneManager.LoadScene(0);
+  }
+```
