@@ -10,7 +10,7 @@ La entrega se divide en los siguientes bloques principales:
 
 ### 1. Diseño y Evaluación Analítica
 Este documento detalla la base teórica y técnica del sistema implementado.
-* **[Documento de Diseño de Evaluación](FeatherRise_Tracker/Analisis/FASE_1__Diseño_de_la_Evaluación_Analítica.md)**
+* **[Documento de Diseño de Evaluación](FeatherRise_Tracker/Analisis/Informe_Practica_3.md)**
     * **Objetivos e Hipótesis:** Preguntas de investigación planteadas para la evaluación.
     * **Métricas y Eventos:** Definición técnica de qué medimos y qué eventos lanzamos.
     * **Pipeline de Datos:** Descripción de cómo los eventos se transforman en métricas.
@@ -21,7 +21,7 @@ Este documento detalla la base teórica y técnica del sistema implementado.
 
 ### 2. Análisis de Resultados y Conclusiones
 Informe detallado tras procesar los datos recogidos en las sesiones de juego.
-* **[Informe de Análisis de Resultados (Fase 4)](FeatherRise_Tracker/Analisis/INFORME_FASE_4_Analisis.md)**
+* **[Informe de Análisis de Resultados (Fase 4)](FeatherRise_Tracker/Analisis/Analisis_Telemetria.md)**
     * Validación de hipótesis.
     * Detección de cuellos de botella (Heatmaps y tiempos).
     * Conclusiones de diseño y propuestas de mejora.
